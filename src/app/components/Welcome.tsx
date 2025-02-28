@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { saveUserProfile } from '@/lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { signInWithGoogle, getCurrentUser } from '@/lib/supabase';
 
 type WelcomeProps = {
   onStart: (userId: string, fullName: string, email: string) => void;
@@ -10,11 +10,21 @@ type WelcomeProps = {
 };
 
 export default function Welcome({ onStart, language, onLanguageChange }: WelcomeProps) {
-  const [step, setStep] = useState<'intro' | 'form'>('intro');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState({ fullName: '', email: '', server: '' });
+  const [step, setStep] = useState<'intro' | 'auth'>('intro');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkCurrentUser = async () => {
+      const user = await getCurrentUser();
+      if (user && user.id && user.fullName && user.email) {
+        onStart(user.id, user.fullName, user.email);
+      }
+    };
+
+    checkCurrentUser();
+  }, [onStart]);
 
   const content = {
     title: {
@@ -47,98 +57,50 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
       english: 'Estimated time: 10-15 minutes',
       french: 'Temps estimé : 10-15 minutes'
     },
-    start: {
-      english: 'Start Survey',
-      french: 'Commencer l\'enquête'
-    },
     next: {
       english: 'Next',
       french: 'Suivant'
     },
-    fullName: {
-      english: 'Full Name',
-      french: 'Nom Complet'
+    signInWithGoogle: {
+      english: 'Sign in with Google',
+      french: 'Se connecter avec Google'
     },
-    email: {
-      english: 'Email Address',
-      french: 'Adresse Email'
+    authTitle: {
+      english: 'Sign in to continue',
+      french: 'Connectez-vous pour continuer'
     },
-    formTitle: {
-      english: 'Before we begin...',
-      french: 'Avant de commencer...'
+    authSubtitle: {
+      english: 'We\'ll use your Google account to identify your responses',
+      french: 'Nous utiliserons votre compte Google pour identifier vos réponses'
     },
-    formSubtitle: {
-      english: 'Please provide your information',
-      french: 'Veuillez fournir vos informations'
-    },
-    required: {
-      english: 'This field is required',
-      french: 'Ce champ est obligatoire'
-    },
-    invalidEmail: {
-      english: 'Please enter a valid email address',
-      french: 'Veuillez entrer une adresse email valide'
-    },
-    serverError: {
+    error: {
       english: 'An error occurred. Please try again.',
       french: 'Une erreur s\'est produite. Veuillez réessayer.'
     }
   };
 
   const handleNextClick = () => {
-    setStep('form');
+    setStep('auth');
   };
 
-  const validateForm = () => {
-    const newErrors = { fullName: '', email: '', server: '' };
-    let isValid = true;
-
-    if (!fullName.trim()) {
-      newErrors.fullName = content.required[language];
-      isValid = false;
-    }
-
-    if (!email.trim()) {
-      newErrors.email = content.required[language];
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = content.invalidEmail[language];
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError('');
     
-    if (validateForm()) {
-      setIsSubmitting(true);
-      
-      try {
-        // Save user profile to Supabase
-        const userId = await saveUserProfile(fullName, email);
-        
-        if (userId) {
-          // If successful, proceed to the survey
-          onStart(userId, fullName, email);
-        } else {
-          // If there was an error, show an error message
-          setErrors(prev => ({ ...prev, server: content.serverError[language] }));
-          setIsSubmitting(false);
-        }
-      } catch (error) {
-        console.error('Error saving user profile:', error);
-        setErrors(prev => ({ ...prev, server: content.serverError[language] }));
-        setIsSubmitting(false);
-      }
+    try {
+      await signInWithGoogle();
+      // The redirect will happen automatically
+      // After redirect back, the useEffect will handle the user
+    } catch (err) {
+      console.error('Error signing in with Google:', err);
+      setError(content.error[language]);
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-      <div className={`max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 ease-in-out ${step === 'form' ? 'transform-gpu scale-100 opacity-100' : ''}`}>
+      <div className={`max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 ease-in-out ${step === 'auth' ? 'transform-gpu scale-100 opacity-100' : ''}`}>
         <div className="h-2 bg-purple-600"></div>
         
         <div className="flex justify-end p-4">
@@ -201,71 +163,35 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
         ) : (
           <div className="p-8 animate-slideUp">
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
-              {content.formTitle[language]}
+              {content.authTitle[language]}
             </h1>
             <p className="text-purple-700 mb-6">
-              {content.formSubtitle[language]}
+              {content.authSubtitle[language]}
             </p>
             
-            {errors.server && (
+            {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-                {errors.server}
+                {error}
               </div>
             )}
             
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                  {content.fullName[language]}
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  className={`text-input w-full ${errors.fullName ? 'border-red-500' : ''}`}
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder={content.fullName[language]}
-                />
-                {errors.fullName && (
-                  <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  {content.email[language]}
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className={`text-input w-full ${errors.email ? 'border-red-500' : ''}`}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={content.email[language]}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
-              </div>
-              
-              <button 
-                type="submit"
-                className="btn-primary w-full py-3 rounded-lg relative"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {language === 'english' ? 'Processing...' : 'Traitement...'}
-                  </span>
-                ) : (
-                  content.start[language]
-                )}
-              </button>
-            </form>
+            <button 
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin"></div>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+              )}
+              <span>{content.signInWithGoogle[language]}</span>
+            </button>
           </div>
         )}
       </div>

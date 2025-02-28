@@ -1,10 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import QuestionComponent from './QuestionComponent';
+import dynamic from 'next/dynamic';
 import Welcome from './Welcome';
 import Completion from './Completion';
-import { saveSurveyResponses } from '@/lib/supabase';
+import { saveSurveyResponses, signOut } from '@/lib/supabase';
+
+// Use dynamic import to fix the module not found error
+// We need to use any type here to avoid type errors with dynamic imports
+const QuestionComponent: any = dynamic(() => import('./QuestionComponent'), { 
+  ssr: false,
+  loading: () => <div className="animate-pulse h-40 bg-gray-100 rounded-lg"></div>
+});
 
 type Answer = {
   questionId: string;
@@ -190,6 +197,12 @@ export default function Questionnaire() {
   // Find answer for current question
   const currentAnswer = answers.find(a => a.questionId === currentQuestionObj?.id)?.answer || '';
 
+  // Add a sign out function to the component
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.reload(); // Reload the page to reset the state
+  };
+
   if (!started) {
     return (
       <Welcome 
@@ -214,7 +227,7 @@ export default function Questionnaire() {
       <header className="questionnaire-header">
         <div className="flex justify-between items-center max-w-4xl mx-auto w-full">
           <h1 className="text-lg font-semibold">Survey: Education & Industry</h1>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <button 
               className={`px-3 py-1 rounded-full text-sm ${language === 'english' ? 'bg-purple-100 text-purple-800' : 'text-gray-600'}`}
               onClick={() => setLanguage('english')}
@@ -226,6 +239,15 @@ export default function Questionnaire() {
               onClick={() => setLanguage('french')}
             >
               Français
+            </button>
+            <button
+              className="ml-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600"
+              onClick={handleSignOut}
+              title={language === 'english' ? 'Sign out' : 'Déconnexion'}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
             </button>
           </div>
         </div>

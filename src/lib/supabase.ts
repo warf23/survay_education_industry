@@ -30,6 +30,89 @@ export type SurveyResponse = {
   created_at?: string;
 };
 
+// Function to sign in with Google
+export async function signInWithGoogle() {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    
+    if (error) {
+      console.error('Error signing in with Google:', error);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Exception during Google sign in:', error);
+    return null;
+  }
+}
+
+// Function to get the current user
+export async function getCurrentUser() {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+    
+    if (!user) return null;
+    
+    // Instead of checking if user exists, use upsert to create or update the profile
+    // This avoids race conditions and simplifies the code
+    const { error: upsertError } = await supabase
+      .from('user_profiles')
+      .upsert({
+        id: user.id,
+        full_name: user.user_metadata.full_name || user.user_metadata.name || 'Anonymous',
+        email: user.email || '',
+        updated_at: new Date().toISOString()
+      }, { 
+        onConflict: 'id'
+      });
+    
+    if (upsertError) {
+      // Log error but don't block the user experience
+      console.log('Note: Unable to sync user profile, but continuing with session data');
+    }
+    
+    // Return user data from the auth session which is guaranteed to exist
+    return {
+      id: user.id,
+      fullName: user.user_metadata.full_name || user.user_metadata.name || 'Anonymous',
+      email: user.email || ''
+    };
+  } catch (error) {
+    console.error('Exception getting current user:', error);
+    return null;
+  }
+}
+
+// Function to sign out
+export async function signOut() {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('Exception during sign out:', error);
+    return false;
+  }
+}
+
 // Function to save user profile
 export async function saveUserProfile(fullName: string, email: string): Promise<string | null> {
   try {

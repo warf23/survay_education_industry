@@ -44,17 +44,44 @@ npm run dev
 
 1. Create a new Supabase project at [https://supabase.com](https://supabase.com)
 
-2. Create the required tables in your Supabase database:
+2. Enable Google Authentication:
+   - Go to Authentication → Providers → Google
+   - Enable the Google provider
+   - Create OAuth credentials in [Google Cloud Console](https://console.cloud.google.com/)
+   - Add the redirect URI: `https://[YOUR_PROJECT_ID].supabase.co/auth/v1/callback`
+   - Add your Client ID and Client Secret to Supabase
+
+3. Create the required tables in your Supabase database:
 
 ### User Profiles Table
 
 ```sql
 CREATE TABLE user_profiles (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id UUID PRIMARY KEY REFERENCES auth.users(id),
   full_name TEXT NOT NULL,
   email TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Add unique constraint to email field
+ALTER TABLE user_profiles ADD CONSTRAINT user_profiles_email_unique UNIQUE (email);
+
+-- Enable Row Level Security
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for authenticated users
+CREATE POLICY "Users can view their own profiles" 
+ON user_profiles FOR SELECT 
+USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert their own profiles" 
+ON user_profiles FOR INSERT 
+WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can update their own profiles" 
+ON user_profiles FOR UPDATE
+USING (auth.uid() = id);
 ```
 
 ### Survey Responses Table
@@ -62,14 +89,26 @@ CREATE TABLE user_profiles (
 ```sql
 CREATE TABLE survey_responses (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID REFERENCES user_profiles(id),
+  user_id UUID REFERENCES auth.users(id),
   question_id TEXT NOT NULL,
   answer TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Enable Row Level Security
+ALTER TABLE survey_responses ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for authenticated users
+CREATE POLICY "Users can view their own responses" 
+ON survey_responses FOR SELECT 
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own responses" 
+ON survey_responses FOR INSERT 
+WITH CHECK (auth.uid() = user_id);
 ```
 
-3. Get your Supabase URL and anon key from your project settings and add them to your `.env.local` file.
+4. Get your Supabase URL and anon key from your project settings and add them to your `.env.local` file.
 
 ## Database Structure
 
