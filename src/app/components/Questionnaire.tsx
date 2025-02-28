@@ -6,12 +6,27 @@ import Welcome from './Welcome';
 import Completion from './Completion';
 import { saveSurveyResponses, signOut } from '@/lib/supabase';
 
-// Use dynamic import to fix the module not found error
-// We need to use any type here to avoid type errors with dynamic imports
-const QuestionComponent: any = dynamic(() => import('./QuestionComponent'), { 
-  ssr: false,
-  loading: () => <div className="animate-pulse h-40 bg-gray-100 rounded-lg"></div>
-});
+// Define the type for QuestionComponent props
+type QuestionComponentProps = {
+  question: {
+    id: string;
+    label: string;
+    english: string;
+    french: string;
+  };
+  language: 'english' | 'french';
+  value: string;
+  onChange: (value: string) => void;
+};
+
+// Use dynamic import with proper typing
+const QuestionComponent = dynamic<QuestionComponentProps>(
+  () => import('./QuestionComponent').then((mod) => mod.default),
+  { 
+    ssr: false,
+    loading: () => <div className="animate-pulse h-40 bg-gray-100 rounded-lg"></div>
+  }
+);
 
 type Answer = {
   questionId: string;
