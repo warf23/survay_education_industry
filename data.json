@@ -1,0 +1,197 @@
+{
+    "categories": [
+      {
+        "id": "A",
+        "title": {
+          "english": "FIRM INFORMATION",
+          "french": "Information d'entreprise"
+        },
+        "questions": [
+          {
+            "id": "A-01",
+            "label": "Industry",
+            "english": "What is your industry sector?",
+            "french": "Quel est votre secteur d'activité ?"
+          },
+          {
+            "id": "A-02",
+            "label": "Region",
+            "english": "Where is your company headquartered?",
+            "french": "Où se trouve le siège social de votre entreprise ?"
+          },
+          {
+            "id": "A-03",
+            "label": "PubPriv",
+            "english": "Is your company Public or Private?",
+            "french": "Votre entreprise est-elle publique ou privée ?"
+          },
+          {
+            "id": "A-04",
+            "label": "FirmSize",
+            "english": "What is the firm size? Please choose from the list",
+            "french": "Quelle est la taille de votre entreprise (nombre d'employés) ?"
+          },
+          {
+            "id": "A-05",
+            "label": "Age",
+            "english": "What is the age of the firm? Please choose from the list",
+            "french": "Quel est l'âge de votre entreprise ?"
+          },
+          {
+            "id": "A-06",
+            "label": "Strengths",
+            "english": "What are your strengths in terms of skills, resources and market positioning?",
+            "french": "Quelle sont vos forces en terme de compétences, de ressources et de positionnement sur le marché"
+          },
+          {
+            "id": "A-07",
+            "label": "Methodology",
+            "english": "What is your company's recruitment process?",
+            "french": "Quel est le process de recrutement adopté par votre entreprise?"
+          },
+          {
+            "id": "A-08",
+            "label": "Opportunities",
+            "english": "What market opportunities are available?",
+            "french": "Quelle sont les opportunités à saisir sur le marché?"
+          },
+          {
+            "id": "A-09",
+            "label": "Competitors",
+            "english": "Who are your main competitors?",
+            "french": "Qui sont vos principaux concurrents relatif à votre activité?"
+          },
+          {
+            "id": "A-10",
+            "label": "Innovation",
+            "english": "How does your company measure its innovation (R&D)?",
+            "french": "Comment votre entreprise mesure-elle son innovation (R&D) ?"
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "title": {
+          "english": "SKILLS IDENTIFICATION",
+          "french": "Identification des Compétences"
+        },
+        "questions": [
+          {
+            "id": "B-01",
+            "label": "Skills",
+            "english": "What key skills do you teach or use in your organization?",
+            "french": "Quelles sont les compétences clés que vous enseignez ou utilisez dans votre organisation ?"
+          },
+          {
+            "id": "B-02",
+            "label": "Relevance",
+            "english": "How would you rate the importance of these skills in the current market context?",
+            "french": "Comment évaluez-vous l'importance de ces compétences dans le contexte actuel du marché ?"
+          },
+          {
+            "id": "B-03",
+            "label": "Specific skills",
+            "english": "Are there any specific skills currently lacking in your sector?",
+            "french": "Existe-t-il des compétences spécifiques qui manquent actuellement dans votre secteur ?"
+          },
+          {
+            "id": "B-04",
+            "label": "Skills update",
+            "english": "How are skills updated to keep pace with technological developments?",
+            "french": "Comment les compétences sont-elles mises à jour pour s'adapter aux évolutions technologiques ?"
+          },
+          {
+            "id": "B-05",
+            "label": "Skills assessment",
+            "english": "What tools or methods do you use to assess learner/employee skills?",
+            "french": "Quels outils ou méthodes utilisez-vous pour évaluer les compétences des apprenants / employés ?"
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "title": {
+          "english": "COLLABORATION BETWEEN EDUCATION AND INDUSTRY",
+          "french": "Collaboration entre Éducation et Industrie"
+        },
+        "questions": [
+          {
+            "id": "C-01",
+            "label": "Training partnerships",
+            "english": "Do you have formal partnerships with training institutions? If so, which ones?",
+            "french": "Avez-vous des partenariats formels avec des institutions de formation? Si oui, lesquels ?"
+          },
+          {
+            "id": "C-02",
+            "label": "Influence of partnerships",
+            "english": "How do these partnerships influence skills development?",
+            "french": "Comment ces partenariats influencent-ils le développement des compétences ?"
+          },
+          {
+            "id": "C-03",
+            "label": "Collaboration difficulties",
+            "english": "What are the main difficulties encountered in the collaboration between education and industry?",
+            "french": "Quelles sont les principales difficultés rencontrées dans la collaboration entre éducation et industrie ?"
+          },
+          {
+            "id": "C-04",
+            "label": "Knowledge",
+            "english": "What are the channels through which companies can pass on their knowledge to training establishments?",
+            "french": "Quels sont les canaux permettant aux entreprises de transmettre leurs savoir aux établissements de formation ?"
+          },
+          {
+            "id": "C-05",
+            "label": "Cooperation",
+            "english": "What initiatives could improve cooperation between the two sectors?",
+            "french": "Quelles initiatives pourraient améliorer la coopération entre les deux secteurs ?"
+          }
+        ]
+      },
+      {
+        "id": "D",
+        "title": {
+          "english": "FUTURE PROSPECTS",
+          "french": "Perspectives d'Avenir"
+        },
+        "questions": [
+          {
+            "id": "D-01",
+            "label": "Future skills",
+            "english": "What skills do you expect to be essential in the next 5 to 10 years?",
+            "french": "Quelles compétences anticipiez-vous comme essentielles dans les 5 à 10 prochaines années ?"
+          },
+          {
+            "id": "D-02",
+            "label": "Method",
+            "english": "How do you think teaching methods should evolve to meet these future needs?",
+            "french": "Comment pensez-vous que les méthodes d'enseignement devraient évoluer pour répondre à ces besoins futurs ?"
+          },
+          {
+            "id": "D-03",
+            "label": "Role",
+            "english": "What role will new technologies (AI, digitization, etc.) play in skills development?",
+            "french": "Quels rôles les nouvelles technologies (IA, digitalisation, etc.) joueront-elles dans le développement des compétences ?"
+          },
+          {
+            "id": "D-04",
+            "label": "Effectiveness",
+            "english": "How do you measure the effectiveness of the skills developed in relation to market requirements?",
+            "french": "Comment mesurez-vous l'efficacité des compétences développées par rapport aux exigences du marché ?"
+          },
+          {
+            "id": "D-05",
+            "label": "Recommendations",
+            "english": "What recommendations would you make to improve the match between education and industrial needs?",
+            "french": "Quelles recommandations feriez-vous pour renforcer l'adéquation entre l'éducation et les besoins industriels ?"
+          },
+          {
+            "id": "D-06",
+            "label": "Additional Comments",
+            "english": "Do you have any additional suggestions or comments to improve the questionnaire?",
+            "french": "Avez-vous des suggestions ou commentaires pour améliorer le questionnaire ?"
+          }
+        ]
+      }
+    ]
+  }
+  
