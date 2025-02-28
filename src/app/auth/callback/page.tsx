@@ -10,14 +10,31 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
-      const { error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Error handling auth callback:', error);
+      try {
+        // Check if we have a hash fragment in the URL (common with OAuth redirects)
+        if (window.location.hash && window.location.hash.includes('access_token')) {
+          // The hash contains the access token, let Supabase handle it
+          const { error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error('Error handling auth callback:', error);
+          }
+        } else {
+          // No hash, just get the session normally
+          const { error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error('Error handling auth callback:', error);
+          }
+        }
+        
+        // Redirect back to the survey
+        router.push('/');
+      } catch (error) {
+        console.error('Exception in auth callback:', error);
+        // Still redirect to home page even if there's an error
+        router.push('/');
       }
-      
-      // Redirect back to the survey
-      router.push('/');
     };
 
     handleAuthCallback();

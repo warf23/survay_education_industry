@@ -1,0 +1,17 @@
+{
+  "buildCommand": "next build",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "redirects": [
+    {
+      "source": "/auth/callback",
+      "destination": "/",
+      "permanent": false
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@next_public_supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@next_public_supabase_anon_key"
+  }
+} 

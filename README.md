@@ -48,10 +48,21 @@ npm run dev
    - Go to Authentication → Providers → Google
    - Enable the Google provider
    - Create OAuth credentials in [Google Cloud Console](https://console.cloud.google.com/)
-   - Add the redirect URI: `https://[YOUR_PROJECT_ID].supabase.co/auth/v1/callback`
+   - Add the following redirect URIs:
+     - For local development: `https://[YOUR_PROJECT_ID].supabase.co/auth/v1/callback`
+     - For production: `https://[YOUR_VERCEL_DOMAIN].vercel.app/auth/callback`
    - Add your Client ID and Client Secret to Supabase
 
-3. Create the required tables in your Supabase database:
+3. Configure Supabase Auth Settings:
+   - Go to Authentication → URL Configuration
+   - Add your site URLs:
+     - For local development: `http://localhost:3000`
+     - For production: `https://[YOUR_VERCEL_DOMAIN].vercel.app`
+   - Add redirect URLs:
+     - For local development: `http://localhost:3000/auth/callback`
+     - For production: `https://[YOUR_VERCEL_DOMAIN].vercel.app/auth/callback`
+
+4. Create the required tables in your Supabase database:
 
 ### User Profiles Table
 
@@ -130,6 +141,40 @@ The application uses two main tables:
 ## Deployment
 
 This is a Next.js application that can be deployed to platforms like Vercel, Netlify, or any other hosting service that supports Next.js.
+
+### Deploying to Vercel
+
+1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+
+2. Create a new project on [Vercel](https://vercel.com)
+
+3. Import your Git repository
+
+4. Configure environment variables:
+   - Go to Settings → Environment Variables
+   - Add the following variables:
+     - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
+
+5. Deploy your application
+
+6. After deployment, update your Supabase configuration:
+   - Go to your Supabase project → Authentication → URL Configuration
+   - Add your Vercel domain to the Site URL list
+   - Add `https://[YOUR_VERCEL_DOMAIN].vercel.app/auth/callback` to the Redirect URLs list
+
+7. Update your Google OAuth credentials:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials
+   - Edit your OAuth 2.0 Client ID
+   - Add `https://[YOUR_PROJECT_ID].supabase.co/auth/v1/callback` to the Authorized redirect URIs
+
+### Troubleshooting Deployment Issues
+
+- **OAuth Redirect Issues**: If you see the access token in the URL after login, make sure you've properly configured the redirect URLs in both Supabase and Google OAuth settings.
+  
+- **Environment Variables**: Verify that your environment variables are correctly set in Vercel.
+
+- **CORS Errors**: If you encounter CORS errors, ensure your Supabase project has the correct site URL configured.
 
 ## License
 
