@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.1",
+    "framer-motion": "^12.4.7",
     "next": "15.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
