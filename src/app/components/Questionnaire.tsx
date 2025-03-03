@@ -244,16 +244,6 @@ export default function Questionnaire() {
     }
   };
 
-  const handleRestart = () => {
-    setStarted(false);
-    setCompleted(false);
-    setCurrentSection(0);
-    setCurrentQuestion(0);
-    setAnswers([]);
-    setUserInfo(null);
-    setSubmitError('');
-  };
-
   const handleStart = (userId: string, fullName: string, email: string) => {
     setUserInfo({
       id: userId,
@@ -373,7 +363,6 @@ export default function Questionnaire() {
     return (
       <Completion 
         language={language} 
-        onRestart={handleRestart} 
       />
     );
   }

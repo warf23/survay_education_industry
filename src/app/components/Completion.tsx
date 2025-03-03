@@ -1,13 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 type CompletionProps = {
   language: 'english' | 'french';
-  onRestart: () => void;
 };
 
-export default function Completion({ language, onRestart }: CompletionProps) {
+export default function Completion({ language }: CompletionProps) {
+  const [showConfetti, setShowConfetti] = useState(false);
+  
+  useEffect(() => {
+    // Show confetti animation after component mounts
+    setShowConfetti(true);
+    
+    // Hide confetti after 5 seconds
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
   const content = {
     title: {
       english: 'Thank You!',
@@ -24,25 +37,43 @@ export default function Completion({ language, onRestart }: CompletionProps) {
     dataUsage: {
       english: 'Your data will be used for research purposes only and will be handled with confidentiality.',
       french: 'Vos données seront utilisées uniquement à des fins de recherche et seront traitées en toute confidentialité.'
-    },
-    restart: {
-      english: 'Start New Survey',
-      french: 'Démarrer une nouvelle enquête'
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="h-2 bg-purple-600"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 relative overflow-hidden">
+      {/* Confetti animation */}
+      {showConfetti && (
+        <div className="absolute inset-0 pointer-events-none">
+          {[...Array(50)].map((_, i) => (
+            <div 
+              key={i}
+              className="absolute animate-confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `-5%`,
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                background: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                borderRadius: '50%',
+                animationDuration: `${Math.random() * 3 + 2}s`,
+                animationDelay: `${Math.random() * 0.5}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
+      
+      <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-700 ease-out animate-slideUp">
+        <div className="h-2 bg-gradient-to-r from-purple-600 to-indigo-600"></div>
         <div className="p-8 text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-purple-100 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 flex items-center justify-center transform transition-all duration-700 animate-bounce-slow">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 animate-fadeIn">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 mb-4 animate-fadeIn">
             {content.title[language]}
           </h1>
           
@@ -54,19 +85,11 @@ export default function Completion({ language, onRestart }: CompletionProps) {
             {content.impact[language]}
           </p>
           
-          <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-10 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-lg p-4 mb-6 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
             <p className="text-purple-700">
               {content.dataUsage[language]}
             </p>
           </div>
-          
-          <button 
-            className="btn-primary mx-auto animate-fadeIn"
-            onClick={onRestart}
-            style={{ animationDelay: '0.8s' }}
-          >
-            {content.restart[language]}
-          </button>
         </div>
       </div>
     </div>
