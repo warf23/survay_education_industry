@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Welcome from './Welcome';
 import Completion from './Completion';
-import { saveSurveyResponses, signOut } from '@/lib/supabase';
+import { saveSurveyResponses, signOut, hasUserSubmittedResponses } from '@/lib/supabase';
 
 // Define the type for QuestionComponent props
 type QuestionComponentProps = {
@@ -72,6 +72,8 @@ export default function Questionnaire() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [isCheckingSubmission, setIsCheckingSubmission] = useState(false);
 
   useEffect(() => {
     // Fetch data.json when component mounts
@@ -124,6 +126,19 @@ export default function Questionnaire() {
   };
 
   const handleNext = () => {
+    // Get the current question object
+    const currentQuestionObj = currentCategory?.questions[currentQuestion];
+    
+    // Ensure we have an answer for the current question (even if it's an empty string)
+    if (currentQuestionObj) {
+      const hasAnswer = answers.some(a => a.questionId === currentQuestionObj.id);
+      
+      if (!hasAnswer) {
+        // If no answer exists, create an empty answer
+        handleAnswer(currentQuestionObj.id, '');
+      }
+    }
+    
     // Check if we're at the last question in the section
     if (currentQuestion < totalQuestionsInSection - 1) {
       // Move to next question in the same section
@@ -159,6 +174,9 @@ export default function Questionnaire() {
   const handleSubmit = async () => {
     if (!userInfo) {
       console.error('No user info available');
+      setSubmitError(language === 'english' 
+        ? 'User information is missing. Please try signing in again.' 
+        : 'Les informations utilisateur sont manquantes. Veuillez vous reconnecter.');
       return;
     }
 
@@ -166,8 +184,29 @@ export default function Questionnaire() {
     setSubmitError('');
 
     try {
+      console.log('Submitting survey responses for user:', userInfo.id);
+      
+      // Ensure all questions have answers (even if they're empty strings)
+      const allQuestions: QuestionData[] = [];
+      categories.forEach(category => {
+        category.questions.forEach(question => {
+          allQuestions.push(question);
+        });
+      });
+      
+      // Create a complete set of answers
+      const completeAnswers = [...answers];
+      
+      // Add empty answers for any questions that don't have answers yet
+      allQuestions.forEach(question => {
+        const hasAnswer = completeAnswers.some(a => a.questionId === question.id);
+        if (!hasAnswer) {
+          completeAnswers.push({ questionId: question.id, answer: '' });
+        }
+      });
+      
       // Save survey responses to Supabase
-      const success = await saveSurveyResponses(userInfo.id, answers);
+      const success = await saveSurveyResponses(userInfo.id, completeAnswers);
       
       if (success) {
         // If successful, show completion screen
@@ -175,14 +214,31 @@ export default function Questionnaire() {
       } else {
         // If there was an error, show an error message
         setSubmitError(language === 'english' 
-          ? 'An error occurred while saving your responses. Please try again.' 
-          : 'Une erreur s\'est produite lors de l\'enregistrement de vos réponses. Veuillez réessayer.');
+          ? 'An error occurred while saving your responses. Please try again or contact support.' 
+          : 'Une erreur s\'est produite lors de l\'enregistrement de vos réponses. Veuillez réessayer ou contacter le support.');
       }
     } catch (error) {
       console.error('Error saving survey responses:', error);
-      setSubmitError(language === 'english' 
-        ? 'An error occurred while saving your responses. Please try again.' 
-        : 'Une erreur s\'est produite lors de l\'enregistrement de vos réponses. Veuillez réessayer.');
+      
+      // Display a more specific error message if possible
+      let errorMessage = '';
+      if (error instanceof Error) {
+        if (error.message.includes('foreign key constraint')) {
+          errorMessage = language === 'english'
+            ? 'There was an issue with your user account. Please try signing out and in again.'
+            : 'Il y a eu un problème avec votre compte utilisateur. Veuillez essayer de vous déconnecter et de vous reconnecter.';
+        } else {
+          errorMessage = language === 'english' 
+            ? 'An error occurred while saving your responses. Please try again.' 
+            : 'Une erreur s\'est produite lors de l\'enregistrement de vos réponses. Veuillez réessayer.';
+        }
+      } else {
+        errorMessage = language === 'english' 
+          ? 'An unknown error occurred. Please try again.' 
+          : 'Une erreur inconnue s\'est produite. Veuillez réessayer.';
+      }
+      
+      setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -195,6 +251,7 @@ export default function Questionnaire() {
     setCurrentQuestion(0);
     setAnswers([]);
     setUserInfo(null);
+    setSubmitError('');
   };
 
   const handleStart = (userId: string, fullName: string, email: string) => {
@@ -203,7 +260,44 @@ export default function Questionnaire() {
       fullName,
       email
     });
-    setStarted(true);
+    
+    // Check if the user has already submitted responses
+    setIsCheckingSubmission(true);
+    hasUserSubmittedResponses(userId)
+      .then(hasSubmitted => {
+        setHasSubmitted(hasSubmitted);
+        setIsCheckingSubmission(false);
+        
+        // Initialize empty answers for all questions
+        if (data) {
+          const initialAnswers: Answer[] = [];
+          data.categories.forEach(category => {
+            category.questions.forEach(question => {
+              initialAnswers.push({ questionId: question.id, answer: '' });
+            });
+          });
+          setAnswers(initialAnswers);
+        }
+        
+        setStarted(true);
+      })
+      .catch(error => {
+        console.error('Error checking if user has submitted responses:', error);
+        setIsCheckingSubmission(false);
+        
+        // Initialize empty answers for all questions
+        if (data) {
+          const initialAnswers: Answer[] = [];
+          data.categories.forEach(category => {
+            category.questions.forEach(question => {
+              initialAnswers.push({ questionId: question.id, answer: '' });
+            });
+          });
+          setAnswers(initialAnswers);
+        }
+        
+        setStarted(true);
+      });
   };
 
   // Get current question
@@ -225,6 +319,53 @@ export default function Questionnaire() {
         language={language}
         onLanguageChange={setLanguage}
       />
+    );
+  }
+
+  if (isCheckingSubmission) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {language === 'english' ? 'Checking your previous submissions...' : 'Vérification de vos soumissions précédentes...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasSubmitted) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+        <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="h-2 bg-purple-600"></div>
+          <div className="p-8">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              {language === 'english' ? 'You have already completed this survey' : 'Vous avez déjà complété cette enquête'}
+            </h1>
+            <p className="text-gray-600 mb-6">
+              {language === 'english' 
+                ? 'Thank you for your previous submission. Your responses have been recorded and will be updated if you choose to continue.' 
+                : 'Merci pour votre soumission précédente. Vos réponses ont été enregistrées et seront mises à jour si vous choisissez de continuer.'}
+            </p>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setHasSubmitted(false)} 
+                className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                {language === 'english' ? 'Continue Anyway' : 'Continuer Quand Même'}
+              </button>
+              <button 
+                onClick={handleSignOut} 
+                className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                {language === 'english' ? 'Sign Out' : 'Se Déconnecter'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 

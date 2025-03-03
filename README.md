@@ -179,3 +179,90 @@ This is a Next.js application that can be deployed to platforms like Vercel, Net
 ## License
 
 This project is licensed under the MIT License.
+
+
+
+
+
+
+
+
+
+# database 
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create user_profiles table
+CREATE TABLE user_profiles (
+  id UUID PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ,
+  UNIQUE(email)
+);
+
+-- Create survey_responses table
+CREATE TABLE survey_responses (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE,
+  question_id TEXT NOT NULL,
+  answer TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ,
+  UNIQUE(user_id, question_id)
+);
+
+-- Create function to update updated_at column
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger for user_profiles table
+CREATE TRIGGER update_user_profiles_updated_at
+BEFORE UPDATE ON user_profiles
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- Create trigger for survey_responses table
+CREATE TRIGGER update_survey_responses_updated_at
+BEFORE UPDATE ON survey_responses
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+-- Create indexes for better performance
+CREATE INDEX idx_user_profiles_email ON user_profiles(email);
+CREATE INDEX idx_survey_responses_user_id ON survey_responses(user_id);
+CREATE INDEX idx_survey_responses_question_id ON survey_responses(question_id);
+
+-- Enable Row Level Security (RLS)
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE survey_responses ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_profiles table
+CREATE POLICY user_profiles_select_policy ON user_profiles
+  FOR SELECT USING (auth.uid() = id OR auth.uid() IS NOT NULL);
+
+CREATE POLICY user_profiles_insert_policy ON user_profiles
+  FOR INSERT WITH CHECK (auth.uid() = id OR auth.uid() IS NOT NULL);
+
+CREATE POLICY user_profiles_update_policy ON user_profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Create policies for survey_responses table
+CREATE POLICY survey_responses_select_policy ON survey_responses
+  FOR SELECT USING (auth.uid() = user_id OR auth.uid() IS NOT NULL);
+
+CREATE POLICY survey_responses_insert_policy ON survey_responses
+  FOR INSERT WITH CHECK (auth.uid() = user_id OR auth.uid() IS NOT NULL);
+
+CREATE POLICY survey_responses_update_policy ON survey_responses
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY survey_responses_delete_policy ON survey_responses
+  FOR DELETE USING (auth.uid() = user_id);
