@@ -1,7 +1,8 @@
 import { supabase } from './supabase';
+import { SurveyResponse } from '@/app/admin/dashboard/page';
 
 // Function to fetch survey responses from the database
-export async function fetchSurveyResponses() {
+export async function fetchSurveyResponses(): Promise<SurveyResponse[]> {
   try {
     // Fetch data from the survey_responses_flat1 view
     const { data, error } = await supabase
@@ -21,7 +22,7 @@ export async function fetchSurveyResponses() {
 }
 
 // Function to export survey responses as CSV
-export function exportToCsv(data: any[], filename: string = 'survey_responses.csv') {
+export function exportToCsv(data: SurveyResponse[], filename: string = 'survey_responses.csv') {
   if (data.length === 0) {
     console.warn('No data to export');
     return;
@@ -62,7 +63,7 @@ export function exportToCsv(data: any[], filename: string = 'survey_responses.cs
 }
 
 // Function to get analytics data from survey responses
-export function getAnalytics(data: any[]) {
+export function getAnalytics(data: SurveyResponse[]) {
   if (data.length === 0) {
     return {
       totalResponses: 0,
@@ -74,15 +75,15 @@ export function getAnalytics(data: any[]) {
   
   // Count responses by industry
   const responsesByIndustry = data.reduce((acc: Record<string, number>, item) => {
-    const industry = item.Industry || 'Unknown';
-    acc[industry] = (acc[industry] || 0) + 1;
+    const industry = item.Industry as string || 'Unknown';
+    acc[industry] = (acc[industry] ?? 0) + 1;
     return acc;
   }, {});
   
   // Count responses by region
   const responsesByRegion = data.reduce((acc: Record<string, number>, item) => {
-    const region = item.Region || 'Unknown';
-    acc[region] = (acc[region] || 0) + 1;
+    const region = item.Region as string || 'Unknown';
+    acc[region] = (acc[region] ?? 0) + 1;
     return acc;
   }, {});
   

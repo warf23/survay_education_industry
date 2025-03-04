@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { SurveyResponse } from '@/app/admin/dashboard/page';
 
 type SurveyResponsesTableProps = {
-  data: any[];
+  data: SurveyResponse[];
 };
 
 export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps) {
@@ -43,13 +44,17 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
     if (!sortConfig) return filteredData;
     
     return [...filteredData].sort((a, b) => {
-      if (a[sortConfig.key] === null) return 1;
-      if (b[sortConfig.key] === null) return -1;
+      // Handle null/undefined values
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
       
-      if (a[sortConfig.key] < b[sortConfig.key]) {
+      if (aValue === null || aValue === undefined) return 1;
+      if (bValue === null || bValue === undefined) return -1;
+      
+      if (aValue < bValue) {
         return sortConfig.direction === 'ascending' ? -1 : 1;
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
+      if (aValue > bValue) {
         return sortConfig.direction === 'ascending' ? 1 : -1;
       }
       return 0;
@@ -88,7 +93,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
   };
 
   // View details modal
-  const [selectedRow, setSelectedRow] = useState<any | null>(null);
+  const [selectedRow, setSelectedRow] = useState<SurveyResponse | null>(null);
 
   if (data.length === 0) {
     return (

@@ -8,10 +8,16 @@ import AdminHeader from '@/app/components/admin/AdminHeader';
 import AdminSidebar from '@/app/components/admin/AdminSidebar';
 import { fetchSurveyResponses } from '@/lib/admin-data';
 
+export interface SurveyResponse {
+  id: string;
+  // Add other properties that exist in your survey responses
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [surveyData, setSurveyData] = useState([]);
+  const [surveyData, setSurveyData] = useState<SurveyResponse[]>([]);
   const [activeView, setActiveView] = useState('table');
   const router = useRouter();
 
