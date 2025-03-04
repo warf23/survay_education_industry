@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { SurveyResponse } from '@/app/admin/dashboard/page';
+import { exportToCsv } from '@/lib/admin-data';
 
 type SurveyResponsesTableProps = {
   data: SurveyResponse[];
@@ -112,8 +113,8 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       {/* Table controls */}
-      <div className="p-4 border-b border-gray-200 flex flex-wrap items-center justify-between gap-4">
-        <div className="relative">
+      <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-4">
+        <div className="relative w-full sm:w-auto">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
@@ -122,62 +123,36 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
           <input
             type="text"
             placeholder="Search responses..."
-            className="pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              setCurrentPage(1); // Reset to first page when searching
+              setCurrentPage(1);
             }}
           />
         </div>
         
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <label htmlFor="rows-per-page" className="mr-2 text-sm text-gray-600">
-              Rows per page:
-            </label>
-            <select
-              id="rows-per-page"
-              className="border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-              value={rowsPerPage}
-              onChange={handleRowsPerPageChange}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-          </div>
-          
+        <div className="flex items-center space-x-2 w-full sm:w-auto mt-2 sm:mt-0">
           <button
-            className="px-3 py-1 bg-purple-100 text-purple-700 rounded-md text-sm hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            onClick={() => {
-              // Export to CSV
-              const headers = columns.join(',');
-              const csvRows = sortedData.map(row => 
-                columns.map(column => {
-                  const value = row[column];
-                  // Handle values with commas by wrapping in quotes
-                  return value !== null && value !== undefined 
-                    ? `"${String(value).replace(/"/g, '""')}"` 
-                    : '';
-                }).join(',')
-              );
-              
-              const csvContent = [headers, ...csvRows].join('\n');
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.setAttribute('href', url);
-              link.setAttribute('download', 'survey_responses.csv');
-              link.style.visibility = 'hidden';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }}
+            onClick={() => exportToCsv(data, 'survey_responses.csv')}
+            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 w-full sm:w-auto justify-center sm:justify-start"
           >
-            Export CSV
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download CSV
           </button>
+          
+          <select
+            value={rowsPerPage}
+            onChange={handleRowsPerPageChange}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          >
+            <option value={10}>10 rows</option>
+            <option value={25}>25 rows</option>
+            <option value={50}>50 rows</option>
+            <option value={100}>100 rows</option>
+          </select>
         </div>
       </div>
       
@@ -235,14 +210,14 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
       </div>
       
       {/* Pagination */}
-      <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-        <div className="text-sm text-gray-700">
+      <div className="px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="text-sm text-gray-700 w-full sm:w-auto text-center sm:text-left">
           Showing <span className="font-medium">{Math.min(sortedData.length, (currentPage - 1) * rowsPerPage + 1)}</span> to{' '}
           <span className="font-medium">{Math.min(sortedData.length, currentPage * rowsPerPage)}</span> of{' '}
           <span className="font-medium">{sortedData.length}</span> results
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 w-full sm:w-auto justify-center sm:justify-end">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}

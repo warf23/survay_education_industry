@@ -38,14 +38,14 @@ export default function AdminSidebar({ activeView, setActiveView }: AdminSidebar
   };
 
   return (
-    <div className="w-64 bg-white shadow-sm border-r border-gray-200">
-      <div className="h-full px-3 py-4">
-        <div className="space-y-1">
+    <div className="w-full md:w-64 bg-white shadow-sm border-b md:border-b-0 md:border-r border-gray-200">
+      <div className="p-3 md:py-4 md:px-3">
+        <div className="flex md:flex-col space-x-2 md:space-x-0 md:space-y-1 overflow-x-auto md:overflow-x-visible">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveView(item.id)}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap md:whitespace-normal ${
                 activeView === item.id
                   ? 'bg-purple-100 text-purple-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'

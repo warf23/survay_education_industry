@@ -64,19 +64,19 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <AdminHeader onSignOut={handleSignOut} />
       
-      <div className="flex flex-1">
+      <div className="flex flex-col md:flex-row flex-1">
         <AdminSidebar activeView={activeView} setActiveView={setActiveView} />
         
-        <main className="flex-1 p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Survey Responses</h1>
-            <p className="text-gray-600">View and analyze survey data from respondents</p>
+        <main className="flex-1 p-4 md:p-6 overflow-x-auto">
+          <div className="mb-4 md:mb-6">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Survey Responses</h1>
+            <p className="text-sm md:text-base text-gray-600">View and analyze survey data from respondents</p>
           </div>
           
           {isLoading ? (
-            <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center h-96">
+            <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center h-64 md:h-96">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading survey data...</p>
               </div>
             </div>
