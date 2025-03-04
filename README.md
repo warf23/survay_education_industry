@@ -266,3 +266,61 @@ CREATE POLICY survey_responses_update_policy ON survey_responses
 
 CREATE POLICY survey_responses_delete_policy ON survey_responses
   FOR DELETE USING (auth.uid() = user_id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+# database 
+create table public.survey_responses (
+  id uuid not null default extensions.uuid_generate_v4(),
+  user_id uuid not null,
+  created_at timestamp with time zone not null default now(),
+  updated_at timestamp with time zone null,
+  -- Section A: FIRM INFORMATION
+  "A-01" text null, -- Industry
+  "A-02" text null, -- Region
+  "A-03" text null, -- PubPriv
+  "A-04" text null, -- FirmSize
+  "A-05" text null, -- Age
+  "A-06" text null, -- Strengths
+  "A-07" text null, -- Methodology
+  "A-08" text null, -- Opportunities
+  "A-09" text null, -- Competitors
+  "A-10" text null, -- Innovation
+  -- Section B: SKILLS IDENTIFICATION
+  "B-01" text null, -- Skills
+  "B-02" text null, -- Relevance
+  "B-03" text null, -- Specific skills
+  "B-04" text null, -- Skills update
+  "B-05" text null, -- Skills assessment
+  -- Section C: COLLABORATION
+  "C-01" text null, -- Training partnerships
+  "C-02" text null, -- Influence of partnerships
+  "C-03" text null, -- Collaboration difficulties
+  "C-04" text null, -- Knowledge
+  "C-05" text null, -- Cooperation
+  -- Section D: FUTURE PROSPECTS
+  "D-01" text null, -- Future skills
+  "D-02" text null, -- Method
+  "D-03" text null, -- Role
+  "D-04" text null, -- Effectiveness
+  "D-05" text null, -- Recommendations
+  "D-06" text null, -- Additional Comments
+  constraint survey_responses_pkey primary key (id),
+  constraint survey_responses_user_id_key unique (user_id),
+  constraint survey_responses_user_id_fkey foreign key (user_id) references user_profiles(id) on delete cascade
+) tablespace pg_default;
+
+-- Keep the updated_at trigger
+create trigger update_survey_responses_updated_at before
+update on survey_responses for each row
+execute function update_updated_at_column();
