@@ -13,6 +13,11 @@ type QuestionComponentProps = {
     label: string;
     english: string;
     french: string;
+    type?: string;
+    options?: Array<{
+      english: string;
+      french: string;
+    }>;
   };
   language: 'english' | 'french';
   value: string;
@@ -20,8 +25,8 @@ type QuestionComponentProps = {
 };
 
 // Use dynamic import with proper typing
-const QuestionComponent = dynamic<QuestionComponentProps>(
-  () => import('./QuestionComponent').then((mod) => mod.default),
+const SelectQuestionComponent = dynamic<QuestionComponentProps>(
+  () => import('./SelectQuestionComponent').then((mod) => mod.default),
   { 
     ssr: false,
     loading: () => <div className="animate-pulse h-40 bg-gray-100 rounded-lg"></div>
@@ -417,7 +422,7 @@ export default function Questionnaire() {
           </p>
           
           {currentQuestionObj && (
-            <QuestionComponent
+            <SelectQuestionComponent
               question={currentQuestionObj}
               language={language}
               value={currentAnswer}
