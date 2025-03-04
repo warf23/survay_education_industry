@@ -52,9 +52,8 @@
             "type": "radio",
             "options": [
               { "english": "Public", "french": "Publique" },
-              { "english": "Private", "french": "Privée" },
-              { "english": "Non-profit", "french": "Sans but lucratif" },
-              { "english": "Government", "french": "Gouvernementale" }
+              { "english": "Private", "french": "Privée" }
+             
             ]
           },
           {

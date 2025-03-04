@@ -1,0 +1,170 @@
+create view public.survey_responses_flat1 as
+select
+  sr.user_id,
+  up.full_name,
+  up.email,
+  max(
+    case
+      when sr.question_id = 'A-01'::text then sr.answer
+      else null::text
+    end
+  ) as "Industry",
+  max(
+    case
+      when sr.question_id = 'A-02'::text then sr.answer
+      else null::text
+    end
+  ) as "Region",
+  max(
+    case
+      when sr.question_id = 'A-03'::text then sr.answer
+      else null::text
+    end
+  ) as "Public_Private",
+  max(
+    case
+      when sr.question_id = 'A-04'::text then sr.answer
+      else null::text
+    end
+  ) as "Firm_Size",
+  max(
+    case
+      when sr.question_id = 'A-05'::text then sr.answer
+      else null::text
+    end
+  ) as "Firm_Age",
+  max(
+    case
+      when sr.question_id = 'A-06'::text then sr.answer
+      else null::text
+    end
+  ) as "Strengths",
+  max(
+    case
+      when sr.question_id = 'A-07'::text then sr.answer
+      else null::text
+    end
+  ) as "Recruitment_Process",
+  max(
+    case
+      when sr.question_id = 'A-08'::text then sr.answer
+      else null::text
+    end
+  ) as "Market_Opportunities",
+  max(
+    case
+      when sr.question_id = 'A-09'::text then sr.answer
+      else null::text
+    end
+  ) as "Competitors",
+  max(
+    case
+      when sr.question_id = 'A-10'::text then sr.answer
+      else null::text
+    end
+  ) as "Innovation_Measurement",
+  max(
+    case
+      when sr.question_id = 'B-01'::text then sr.answer
+      else null::text
+    end
+  ) as "Key_Skills",
+  max(
+    case
+      when sr.question_id = 'B-02'::text then sr.answer
+      else null::text
+    end
+  ) as "Skills_Importance",
+  max(
+    case
+      when sr.question_id = 'B-03'::text then sr.answer
+      else null::text
+    end
+  ) as "Missing_Skills",
+  max(
+    case
+      when sr.question_id = 'B-04'::text then sr.answer
+      else null::text
+    end
+  ) as "Skills_Update_Method",
+  max(
+    case
+      when sr.question_id = 'B-05'::text then sr.answer
+      else null::text
+    end
+  ) as "Skills_Assessment_Tools",
+  max(
+    case
+      when sr.question_id = 'C-01'::text then sr.answer
+      else null::text
+    end
+  ) as "Training_Partnerships",
+  max(
+    case
+      when sr.question_id = 'C-02'::text then sr.answer
+      else null::text
+    end
+  ) as "Partnership_Influence",
+  max(
+    case
+      when sr.question_id = 'C-03'::text then sr.answer
+      else null::text
+    end
+  ) as "Collaboration_Difficulties",
+  max(
+    case
+      when sr.question_id = 'C-04'::text then sr.answer
+      else null::text
+    end
+  ) as "Knowledge_Transfer_Channels",
+  max(
+    case
+      when sr.question_id = 'C-05'::text then sr.answer
+      else null::text
+    end
+  ) as "Cooperation_Improvements",
+  max(
+    case
+      when sr.question_id = 'D-01'::text then sr.answer
+      else null::text
+    end
+  ) as "Future_Essential_Skills",
+  max(
+    case
+      when sr.question_id = 'D-02'::text then sr.answer
+      else null::text
+    end
+  ) as "Teaching_Methods_Evolution",
+  max(
+    case
+      when sr.question_id = 'D-03'::text then sr.answer
+      else null::text
+    end
+  ) as "Technology_Role",
+  max(
+    case
+      when sr.question_id = 'D-04'::text then sr.answer
+      else null::text
+    end
+  ) as "Skills_Effectiveness_Measurement",
+  max(
+    case
+      when sr.question_id = 'D-05'::text then sr.answer
+      else null::text
+    end
+  ) as "Education_Industry_Recommendations",
+  max(
+    case
+      when sr.question_id = 'D-06'::text then sr.answer
+      else null::text
+    end
+  ) as "Additional_Comments",
+  max(sr.created_at) as submission_date,
+  max(sr.updated_at) as last_updated
+from
+  survey_responses sr
+  left join user_profiles up on sr.user_id = up.id
+group by
+  sr.user_id,
+  up.full_name,
+  up.email;
