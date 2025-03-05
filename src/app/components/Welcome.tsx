@@ -290,9 +290,9 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
       </div>
       
       {/* Floating elements for visual interest */}
-      <div className="fixed top-20 left-20 w-64 h-64 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
-      <div className="fixed bottom-20 right-20 w-64 h-64 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
-      <div className="fixed bottom-40 left-40 w-64 h-64 bg-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
+      <div className="fixed top-20 left-20 w-64 h-64 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob pointer-events-none -z-10"></div>
+      <div className="fixed bottom-20 right-20 w-64 h-64 bg-teal-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000 pointer-events-none -z-10"></div>
+      <div className="fixed bottom-40 left-40 w-64 h-64 bg-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000 pointer-events-none -z-10"></div>
     </div>
   );
 } 
