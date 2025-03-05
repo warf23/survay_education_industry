@@ -123,7 +123,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
           <input
             type="text"
             placeholder="Search responses..."
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -135,7 +135,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
         <div className="flex items-center space-x-2 w-full sm:w-auto mt-2 sm:mt-0">
           <button
             onClick={() => exportToCsv(data, 'survey_responses.csv')}
-            className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 w-full sm:w-auto justify-center sm:justify-start"
+            className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 w-full sm:w-auto justify-center sm:justify-start"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -146,7 +146,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
           <select
             value={rowsPerPage}
             onChange={handleRowsPerPageChange}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           >
             <option value={10}>10 rows</option>
             <option value={25}>25 rows</option>
@@ -198,7 +198,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => setSelectedRow(row)}
-                    className="text-purple-600 hover:text-purple-900 focus:outline-none focus:underline"
+                    className="text-emerald-600 hover:text-emerald-900 focus:outline-none focus:underline"
                   >
                     View Details
                   </button>
@@ -245,7 +245,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 py-1 border rounded-md text-sm ${
                   currentPage === pageNum
-                    ? 'bg-purple-600 text-white border-purple-600'
+                    ? 'bg-emerald-600 text-white border-emerald-600'
                     : 'border-gray-300 hover:bg-gray-50'
                 }`}
               >

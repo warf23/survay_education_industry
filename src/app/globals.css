@@ -8,9 +8,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --primary: #7e22ce; /* Purple primary color */
-  --primary-light: #a855f7; /* Lighter purple */
-  --primary-dark: #6b21a8; /* Darker purple */
+  --primary: #10b981; /* Emerald-500 primary color */
+  --primary-light: #34d399; /* Emerald-400 lighter */
+  --primary-dark: #059669; /* Emerald-600 darker */
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
   --gray-300: #d1d5db;
@@ -61,12 +61,12 @@ body {
 
 .radio-container:hover {
   border-color: var(--primary-light);
-  background-color: rgba(126, 34, 206, 0.05);
+  background-color: rgba(16, 185, 129, 0.05);
 }
 
 .radio-container.selected {
   border-color: var(--primary);
-  background-color: rgba(126, 34, 206, 0.1);
+  background-color: rgba(16, 185, 129, 0.1);
 }
 
 .radio-button {

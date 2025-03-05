@@ -101,18 +101,18 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className={`max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transition-all duration-500 ease-in-out ${step === 'auth' ? 'transform-gpu scale-100 opacity-100' : ''}`}>
-        <div className="h-2 bg-purple-600"></div>
+        <div className="h-2 bg-emerald-600"></div>
         
         <div className="flex justify-end p-4">
           <div className="flex gap-2">
             <button 
-              className={`px-3 py-1 rounded-full text-sm ${language === 'english' ? 'bg-purple-100 text-purple-800' : 'text-gray-600'}`}
+              className={`px-3 py-1 rounded-full text-sm ${language === 'english' ? 'bg-emerald-100 text-emerald-800' : 'text-gray-600'}`}
               onClick={() => onLanguageChange('english')}
             >
               English
             </button>
             <button 
-              className={`px-3 py-1 rounded-full text-sm ${language === 'french' ? 'bg-purple-100 text-purple-800' : 'text-gray-600'}`}
+              className={`px-3 py-1 rounded-full text-sm ${language === 'french' ? 'bg-emerald-100 text-emerald-800' : 'text-gray-600'}`}
               onClick={() => onLanguageChange('french')}
             >
               Français
@@ -125,7 +125,7 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
               {content.title[language]}
             </h1>
-            <p className="text-purple-700 mb-6">
+            <p className="text-emerald-700 mb-6">
               {content.subtitle[language]}
             </p>
             
@@ -140,7 +140,7 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
               <ul className="space-y-2">
                 {content.sections[language].map((section, index) => (
                   <li key={index} className="flex items-center">
-                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 mr-3 text-sm font-medium">
+                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-800 mr-3 text-sm font-medium">
                       {String.fromCharCode(65 + index)}
                     </span>
                     <span>{section}</span>
@@ -165,7 +165,7 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
             <h1 className="text-2xl font-bold text-gray-800 mb-2">
               {content.authTitle[language]}
             </h1>
-            <p className="text-purple-700 mb-6">
+            <p className="text-emerald-700 mb-6">
               {content.authSubtitle[language]}
             </p>
             
@@ -181,7 +181,7 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
               className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-gray-300 border-t-purple-600 rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-gray-300 border-t-emerald-600 rounded-full animate-spin"></div>
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

@@ -65,15 +65,15 @@ export default function Completion({ language }: CompletionProps) {
       )}
       
       <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-700 ease-out animate-slideUp">
-        <div className="h-2 bg-gradient-to-r from-purple-600 to-indigo-600"></div>
+        <div className="h-2 bg-gradient-to-r from-emerald-600 to-teal-600"></div>
         <div className="p-8 text-center">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-purple-100 to-indigo-100 flex items-center justify-center transform transition-all duration-700 animate-bounce-slow">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-emerald-100 to-teal-100 flex items-center justify-center transform transition-all duration-700 animate-bounce-slow">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           
-          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 mb-4 animate-fadeIn">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mb-4 animate-fadeIn">
             {content.title[language]}
           </h1>
           
@@ -85,8 +85,8 @@ export default function Completion({ language }: CompletionProps) {
             {content.impact[language]}
           </p>
           
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-lg p-4 mb-6 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
-            <p className="text-purple-700">
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-lg p-4 mb-6 animate-fadeIn" style={{ animationDelay: '0.6s' }}>
+            <p className="text-emerald-700">
               {content.dataUsage[language]}
             </p>
           </div>

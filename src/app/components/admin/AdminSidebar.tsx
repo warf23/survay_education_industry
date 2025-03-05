@@ -47,7 +47,7 @@ export default function AdminSidebar({ activeView, setActiveView }: AdminSidebar
               onClick={() => setActiveView(item.id)}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md whitespace-nowrap md:whitespace-normal ${
                 activeView === item.id
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-emerald-100 text-emerald-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >

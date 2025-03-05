@@ -47,7 +47,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
       
       {type === 'text' && (
         <textarea
-          className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+          className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
           rows={4}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -81,7 +81,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
               {options.map((option, index) => (
                 <div 
                   key={index} 
-                  className={`p-3 cursor-pointer hover:bg-purple-50 transition-colors ${value === option[language] ? "bg-purple-100 font-medium" : ""}`}
+                  className={`p-3 cursor-pointer hover:bg-emerald-50 transition-colors ${value === option[language] ? "bg-emerald-100 font-medium" : ""}`}
                   onClick={() => {
                     onChange(option[language]);
                     setIsOpen(false);
@@ -103,7 +103,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
               className={`
                 p-4 rounded-lg border cursor-pointer transition-all
                 ${value === option[language] 
-                  ? "border-purple-500 bg-purple-50 shadow-sm" 
+                  ? "border-emerald-500 bg-emerald-50 shadow-sm" 
                   : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}
               `}
               onClick={() => onChange(option[language])}
@@ -111,10 +111,10 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
               <div className="flex items-center">
                 <div className={`
                   h-5 w-5 rounded-full mr-3 flex items-center justify-center
-                  border-2 ${value === option[language] ? "border-purple-600" : "border-gray-400"}
+                  border-2 ${value === option[language] ? "border-emerald-600" : "border-gray-400"}
                 `}>
                   {value === option[language] && (
-                    <div className="h-2.5 w-2.5 bg-purple-600 rounded-full"></div>
+                    <div className="h-2.5 w-2.5 bg-emerald-600 rounded-full"></div>
                   )}
                 </div>
                 <label className="cursor-pointer">
@@ -138,7 +138,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                 className={`
                   p-4 rounded-lg border cursor-pointer transition-all
                   ${isChecked 
-                    ? "border-purple-500 bg-purple-50 shadow-sm" 
+                    ? "border-emerald-500 bg-emerald-50 shadow-sm" 
                     : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}
                 `}
                 onClick={() => handleMultiSelectChange(option[language])}
@@ -146,7 +146,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                 <div className="flex items-center">
                   <div className={`
                     h-5 w-5 rounded-md mr-3 flex items-center justify-center
-                    ${isChecked ? "bg-purple-600 border-purple-600" : "border-2 border-gray-400"}
+                    ${isChecked ? "bg-emerald-600 border-emerald-600" : "border-2 border-gray-400"}
                   `}>
                     {isChecked && (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
