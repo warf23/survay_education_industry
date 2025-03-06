@@ -17,16 +17,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
   // Get all column headers from the data
   const columns = useMemo(() => {
     if (data.length === 0) return [];
-    return Object.keys(data[0]).filter(key => 
-      // Exclude very long text fields from the default view
-      !['Strengths', 'Recruitment_Process', 'Market_Opportunities', 'Competitors', 
-        'Innovation_Measurement', 'Key_Skills', 'Skills_Importance', 'Missing_Skills',
-        'Skills_Update_Method', 'Skills_Assessment_Tools', 'Training_Partnerships',
-        'Partnership_Influence', 'Collaboration_Difficulties', 'Knowledge_Transfer_Channels',
-        'Cooperation_Improvements', 'Future_Essential_Skills', 'Teaching_Methods_Evolution',
-        'Technology_Role', 'Skills_Effectiveness_Measurement', 'Education_Industry_Recommendations',
-        'Additional_Comments'].includes(key)
-    );
+    return Object.keys(data[0]);
   }, [data]);
 
   // Filter data based on search term
@@ -158,14 +149,14 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
       
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200 border-collapse">
+          <thead className="bg-emerald-100">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column}
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider cursor-pointer hover:bg-emerald-200"
                   onClick={() => requestSort(column)}
                 >
                   <div className="flex items-center">
@@ -178,7 +169,7 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
                   </div>
                 </th>
               ))}
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-right text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -187,18 +178,18 @@ export default function SurveyResponsesTable({ data }: SurveyResponsesTableProps
             {paginatedData.map((row, rowIndex) => (
               <tr key={rowIndex} className="hover:bg-gray-50">
                 {columns.map((column) => (
-                  <td key={column} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td key={column} className="px-6 py-4 whitespace-normal text-sm text-gray-700 border-b border-gray-200">
                     {row[column] !== null && row[column] !== undefined
-                      ? String(row[column]).length > 100
-                        ? `${String(row[column]).substring(0, 100)}...`
+                      ? String(row[column]).length > 150
+                        ? `${String(row[column]).substring(0, 150)}...`
                         : String(row[column])
                       : ''}
                   </td>
                 ))}
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium border-b border-gray-200">
                   <button
                     onClick={() => setSelectedRow(row)}
-                    className="text-emerald-600 hover:text-emerald-900 focus:outline-none focus:underline"
+                    className="text-emerald-600 hover:text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 px-3 py-1 rounded-md border border-emerald-300 hover:bg-emerald-50"
                   >
                     View Details
                   </button>

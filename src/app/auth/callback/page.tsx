@@ -11,7 +11,10 @@ export default function AuthCallbackPage() {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
-        // Check if we have a hash fragment in the URL (common with OAuth redirects)
+
+
+
+        // Check if we have a hash fragment in the URL (common with OAuth redirects) okk 
         if (window.location.hash && window.location.hash.includes('access_token')) {
           // The hash contains the access token, let Supabase handle it
           const { error } = await supabase.auth.getSession();
