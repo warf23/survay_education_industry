@@ -28,7 +28,7 @@ export default function QuestionComponent({
       
       <div className="mt-4">
         <textarea
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           rows={5}
           placeholder={language === 'english' ? 'Type your answer here...' : 'Tapez votre réponse ici...'}
           value={value}

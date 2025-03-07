@@ -11,7 +11,10 @@ export default function AuthCallbackPage() {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
-        // Check if we have a hash fragment in the URL (common with OAuth redirects)
+
+
+
+        // Check if we have a hash fragment in the URL (common with OAuth redirects) okk 
         if (window.location.hash && window.location.hash.includes('access_token')) {
           // The hash contains the access token, let Supabase handle it
           const { error } = await supabase.auth.getSession();
@@ -43,7 +46,7 @@ export default function AuthCallbackPage() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-gray-600">Completing sign in...</p>
       </div>
     </div>

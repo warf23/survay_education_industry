@@ -13,6 +13,11 @@ type QuestionComponentProps = {
     label: string;
     english: string;
     french: string;
+    type?: string;
+    options?: Array<{
+      english: string;
+      french: string;
+    }>;
   };
   language: 'english' | 'french';
   value: string;
@@ -20,8 +25,8 @@ type QuestionComponentProps = {
 };
 
 // Use dynamic import with proper typing
-const QuestionComponent = dynamic<QuestionComponentProps>(
-  () => import('./QuestionComponent').then((mod) => mod.default),
+const SelectQuestionComponent = dynamic<QuestionComponentProps>(
+  () => import('./SelectQuestionComponent').then((mod) => mod.default),
   { 
     ssr: false,
     loading: () => <div className="animate-pulse h-40 bg-gray-100 rounded-lg"></div>
@@ -329,7 +334,7 @@ export default function Questionnaire() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
         <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="h-2 bg-purple-600"></div>
+          <div className="h-2 bg-emerald-600"></div>
           <div className="p-8">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">
               {language === 'english' ? 'You have already completed this survey' : 'Vous avez déjà complété cette enquête'}
@@ -342,7 +347,7 @@ export default function Questionnaire() {
             <div className="flex gap-4">
               <button 
                 onClick={() => setHasSubmitted(false)} 
-                className="flex-1 bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex-1 bg-emerald-600 text-white py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors"
               >
                 {language === 'english' ? 'Continue Anyway' : 'Continuer Quand Même'}
               </button>
@@ -374,13 +379,13 @@ export default function Questionnaire() {
           <h1 className="text-lg font-semibold">Survey: Education & Industry</h1>
           <div className="flex gap-2 items-center">
             <button 
-              className={`px-3 py-1 rounded-full text-sm ${language === 'english' ? 'bg-purple-100 text-purple-800' : 'text-gray-600'}`}
+              className={`px-3 py-1 rounded-full text-sm ${language === 'english' ? 'bg-emerald-100 text-emerald-800' : 'text-gray-600'}`}
               onClick={() => setLanguage('english')}
             >
               English
             </button>
             <button 
-              className={`px-3 py-1 rounded-full text-sm ${language === 'french' ? 'bg-purple-100 text-purple-800' : 'text-gray-600'}`}
+              className={`px-3 py-1 rounded-full text-sm ${language === 'french' ? 'bg-emerald-100 text-emerald-800' : 'text-gray-600'}`}
               onClick={() => setLanguage('french')}
             >
               Français
@@ -417,7 +422,7 @@ export default function Questionnaire() {
           </p>
           
           {currentQuestionObj && (
-            <QuestionComponent
+            <SelectQuestionComponent
               question={currentQuestionObj}
               language={language}
               value={currentAnswer}

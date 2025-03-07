@@ -11,61 +11,150 @@
             "id": "A-01",
             "label": "Industry",
             "english": "What is your industry sector?",
-            "french": "Quel est votre secteur d'activité ?"
+            "french": "Quel est votre secteur d'activité ?",
+            "type": "select",
+            "options": [
+              { "english": "Agriculture", "french": "Agriculture" },
+              { "english": "Manufacturing", "french": "Fabrication" },
+              { "english": "Information Technology", "french": "Technologie de l'Information" },
+              { "english": "Healthcare", "french": "Santé" },
+              { "english": "Education", "french": "Éducation" },
+              { "english": "Finance", "french": "Finance" },
+              { "english": "Retail", "french": "Commerce de Détail" },
+              { "english": "Construction", "french": "Construction" },
+              { "english": "Transportation", "french": "Transport" },
+              { "english": "Energy", "french": "Énergie" },
+              { "english": "Media & Entertainment", "french": "Médias et Divertissement" },
+              { "english": "Other", "french": "Autre" }
+            ]
           },
           {
             "id": "A-02",
             "label": "Region",
             "english": "Where is your company headquartered?",
-            "french": "Où se trouve le siège social de votre entreprise ?"
+            "french": "Où se trouve le siège social de votre entreprise ?",
+            "type": "select",
+            "options": [
+              { "english": "North America", "french": "Amérique du Nord" },
+              { "english": "Europe", "french": "Europe" },
+              { "english": "Asia", "french": "Asie" },
+              { "english": "Africa", "french": "Afrique" },
+              { "english": "South America", "french": "Amérique du Sud" },
+              { "english": "Oceania", "french": "Océanie" },
+              { "english": "Middle East", "french": "Moyen-Orient" }
+            ]
           },
           {
             "id": "A-03",
             "label": "PubPriv",
             "english": "Is your company Public or Private?",
-            "french": "Votre entreprise est-elle publique ou privée ?"
+            "french": "Votre entreprise est-elle publique ou privée ?",
+            "type": "radio",
+            "options": [
+              { "english": "Public", "french": "Publique" },
+              { "english": "Private", "french": "Privée" }
+             
+            ]
           },
           {
             "id": "A-04",
             "label": "FirmSize",
             "english": "What is the firm size? Please choose from the list",
-            "french": "Quelle est la taille de votre entreprise (nombre d'employés) ?"
+            "french": "Quelle est la taille de votre entreprise (nombre d'employés) ?",
+            "type": "select",
+            "options": [
+              { "english": "1-10 employees", "french": "1-10 employés" },
+              { "english": "11-50 employees", "french": "11-50 employés" },
+              { "english": "51-200 employees", "french": "51-200 employés" },
+              { "english": "201-500 employees", "french": "201-500 employés" },
+              { "english": "501-1000 employees", "french": "501-1000 employés" },
+              { "english": "1001-5000 employees", "french": "1001-5000 employés" },
+              { "english": "5001+ employees", "french": "5001+ employés" }
+            ]
           },
           {
             "id": "A-05",
             "label": "Age",
             "english": "What is the age of the firm? Please choose from the list",
-            "french": "Quel est l'âge de votre entreprise ?"
+            "french": "Quel est l'âge de votre entreprise ?",
+            "type": "select",
+            "options": [
+              { "english": "Less than 1 year", "french": "Moins d'un an" },
+              { "english": "1-5 years", "french": "1-5 ans" },
+              { "english": "6-10 years", "french": "6-10 ans" },
+              { "english": "11-20 years", "french": "11-20 ans" },
+              { "english": "21-50 years", "french": "21-50 ans" },
+              { "english": "More than 50 years", "french": "Plus de 50 ans" }
+            ]
           },
           {
             "id": "A-06",
             "label": "Strengths",
             "english": "What are your strengths in terms of skills, resources and market positioning?",
-            "french": "Quelle sont vos forces en terme de compétences, de ressources et de positionnement sur le marché"
+            "french": "Quelle sont vos forces en terme de compétences, de ressources et de positionnement sur le marché",
+            "type": "multiselect",
+            "options": [
+              { "english": "Technical expertise", "french": "Expertise technique" },
+              { "english": "Customer service", "french": "Service client" },
+              { "english": "Innovation capability", "french": "Capacité d'innovation" },
+              { "english": "Cost efficiency", "french": "Efficacité des coûts" },
+              { "english": "Brand recognition", "french": "Reconnaissance de la marque" },
+              { "english": "Product quality", "french": "Qualité du produit" },
+              { "english": "Market reach", "french": "Portée du marché" },
+              { "english": "Skilled workforce", "french": "Main-d'œuvre qualifiée" },
+              { "english": "Financial resources", "french": "Ressources financières" },
+              { "english": "Other", "french": "Autre" }
+            ]
           },
           {
             "id": "A-07",
             "label": "Methodology",
             "english": "What is your company's recruitment process?",
-            "french": "Quel est le process de recrutement adopté par votre entreprise?"
+            "french": "Quel est le process de recrutement adopté par votre entreprise?",
+            "type": "multiselect",
+            "options": [
+              { "english": "Traditional interviews", "french": "Entretiens traditionnels" },
+              { "english": "Behavioral interviews", "french": "Entretiens comportementaux" },
+              { "english": "Technical assessments", "french": "Évaluations techniques" },
+              { "english": "Group interviews", "french": "Entretiens de groupe" },
+              { "english": "Assessment centers", "french": "Centres d'évaluation" },
+              { "english": "Online applications", "french": "Candidatures en ligne" },
+              { "english": "Referral programs", "french": "Programmes de parrainage" },
+              { "english": "Recruitment agencies", "french": "Agences de recrutement" },
+              { "english": "Social media recruiting", "french": "Recrutement via médias sociaux" },
+              { "english": "Other", "french": "Autre" }
+            ]
           },
           {
             "id": "A-08",
             "label": "Opportunities",
             "english": "What market opportunities are available?",
-            "french": "Quelle sont les opportunités à saisir sur le marché?"
+            "french": "Quelle sont les opportunités à saisir sur le marché?",
+            "type": "text"
           },
           {
             "id": "A-09",
             "label": "Competitors",
             "english": "Who are your main competitors?",
-            "french": "Qui sont vos principaux concurrents relatif à votre activité?"
+            "french": "Qui sont vos principaux concurrents relatif à votre activité?",
+            "type": "text"
           },
           {
             "id": "A-10",
             "label": "Innovation",
             "english": "How does your company measure its innovation (R&D)?",
-            "french": "Comment votre entreprise mesure-elle son innovation (R&D) ?"
+            "french": "Comment votre entreprise mesure-elle son innovation (R&D) ?",
+            "type": "multiselect",
+            "options": [
+              { "english": "Number of patents filed", "french": "Nombre de brevets déposés" },
+              { "english": "R&D expenditure as % of revenue", "french": "Dépenses de R&D en % du chiffre d'affaires" },
+              { "english": "New product launches", "french": "Lancements de nouveaux produits" },
+              { "english": "Revenue from new products", "french": "Revenus issus de nouveaux produits" },
+              { "english": "Process improvements", "french": "Améliorations des processus" },
+              { "english": "Innovation awards", "french": "Prix d'innovation" },
+              { "english": "Internal idea generation metrics", "french": "Métriques de génération d'idées internes" },
+              { "english": "Other", "french": "Autre" }
+            ]
           }
         ]
       },
