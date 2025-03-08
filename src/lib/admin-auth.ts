@@ -1,56 +1,88 @@
 'use client';
 
-import { jwtDecode } from 'jwt-decode';
+import { supabase } from './supabase';
 
-// Type for the JWT token payload
-type TokenPayload = {
-  email: string;
-  exp: number;
-};
-
-// Function to sign in
+// Function to sign in with email and password
 export async function signIn(email: string, password: string): Promise<boolean> {
-  // Check if the credentials match the environment variables
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD || '123456'; // Fallback for testing
-  
-  if (email === adminEmail && password === adminPassword) {
-    // Create a JWT token (in a real app, this would be done server-side)
-    const token = createToken(email);
+  try {
+    console.log(`Attempting to sign in with email: ${email}`);
     
-    // Store the token in localStorage
-    localStorage.setItem('admin_token', token);
+    // Authenticate with Supabase
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
     
+    if (error) {
+      console.error('Error signing in:', error);
+      return false;
+    }
+    
+    console.log('Sign in successful, checking if user is admin');
+    
+    // Check if the user is an admin by querying the user_profiles table
+    const { data: profileData, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('is_admin')
+      .eq('id', data.user.id)
+      .single();
+    
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
+      // Sign out if we can't verify admin status
+      await supabase.auth.signOut();
+      return false;
+    }
+    
+    if (!profileData || !profileData.is_admin) {
+      console.error('User is not an admin');
+      // Sign out non-admin users
+      await supabase.auth.signOut();
+      return false;
+    }
+    
+    console.log('Admin verification successful');
     return true;
+  } catch (error) {
+    console.error('Exception during sign in:', error);
+    return false;
   }
-  
-  return false;
 }
 
-// Function to check if the user is authenticated
+// Function to check if the user is authenticated as an admin
 export async function checkAuth(): Promise<boolean> {
   try {
-    const token = localStorage.getItem('admin_token');
+    // Get the current session
+    const { data: { session }, error } = await supabase.auth.getSession();
     
-    if (!token) {
+    if (error) {
+      console.error('Error checking session:', error);
       return false;
     }
     
-    // Decode the token to check if it's expired
-    const decoded = jwtDecode<TokenPayload>(token);
-    
-    // Check if the token is expired
-    if (decoded.exp < Date.now() / 1000) {
-      // Token is expired, remove it
-      localStorage.removeItem('admin_token');
+    if (!session) {
+      console.log('No active session found');
       return false;
     }
     
-    // Check if the email matches the admin email
-    if (decoded.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    // Check if the user is an admin by querying the user_profiles table
+    const { data: profileData, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('is_admin')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
       return false;
     }
     
+    if (!profileData || !profileData.is_admin) {
+      console.log('User is not an admin:', session.user?.email);
+      return false;
+    }
+    
+    console.log('User is verified as admin');
     return true;
   } catch (error) {
     console.error('Error checking authentication:', error);
@@ -61,7 +93,15 @@ export async function checkAuth(): Promise<boolean> {
 // Function to sign out
 export async function signOut(): Promise<boolean> {
   try {
-    localStorage.removeItem('admin_token');
+    console.log('Signing out user');
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Error signing out:', error);
+      return false;
+    }
+    
+    console.log('User signed out successfully');
     return true;
   } catch (error) {
     console.error('Error signing out:', error);
@@ -69,24 +109,74 @@ export async function signOut(): Promise<boolean> {
   }
 }
 
-// Function to create a JWT token
-function createToken(email: string): string {
-  // This is a simple implementation for demo purposes
-  // In a real app, this would be done server-side with a proper JWT library
-  const header = {
-    alg: 'HS256',
-    typ: 'JWT'
-  };
-  
-  const payload = {
-    email: email,
-    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24) // 24 hours
-  };
-  
-  const base64Header = btoa(JSON.stringify(header));
-  const base64Payload = btoa(JSON.stringify(payload));
-  
-  // In a real app, this would be signed with a secret key
-  // For demo purposes, we're just concatenating the parts
-  return `${base64Header}.${base64Payload}.demo_signature`;
+export async function fetchSurveyResponses(): Promise<SurveyResponse[]> {
+  try {
+    // First check if user is admin
+    const { data: profileData } = await supabase
+      .from('user_profiles')
+      .select('is_admin')
+      .eq('id', (await supabase.auth.getUser()).data.user?.id)
+      .single();
+
+    if (!profileData?.is_admin) {
+      console.error('Unauthorized access attempt to survey data');
+      return [];
+    }
+
+    // Fetch data from the view
+    const { data, error } = await supabase
+      .from('survey_responses_flat1')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching survey responses:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Exception fetching survey responses:', error);
+    return [];
+  }
+}
+
+// Function to get current admin user information
+export async function getCurrentAdminUser() {
+  try {
+    // Get the current session
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session) {
+      console.error('Error getting user session:', error);
+      return null;
+    }
+    
+    // Get user profile data
+    const { data: profileData, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+    
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
+      return null;
+    }
+    
+    if (!profileData || !profileData.is_admin) {
+      console.log('User is not an admin');
+      return null;
+    }
+    
+    // Return user information
+    return {
+      id: session.user.id,
+      email: session.user.email,
+      name: profileData.full_name || session.user.email?.split('@')[0] || 'Admin User',
+      avatar: profileData.avatar_url || null
+    };
+  } catch (error) {
+    console.error('Error getting current admin user:', error);
+    return null;
+  }
 } 

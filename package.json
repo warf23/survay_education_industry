@@ -6,13 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup-admin": "node src/scripts/setup-admin-user.js",
+    "setup-admin-role": "node src/scripts/apply-admin-role.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.1",
+    "dotenv": "^16.4.1",
     "framer-motion": "^12.4.7",
     "jwt-decode": "^4.0.0",
     "next": "15.2.0",

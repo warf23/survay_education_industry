@@ -1,4 +1,4 @@
-declare module './QuestionComponent' {
+declare module '@/app/components/QuestionComponent' {
   export interface QuestionComponentProps {
     question: {
       id: string;

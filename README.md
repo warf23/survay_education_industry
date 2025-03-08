@@ -103,7 +103,9 @@ CREATE TABLE survey_responses (
   user_id UUID REFERENCES auth.users(id),
   question_id TEXT NOT NULL,
   answer TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, question_id)
 );
 
 -- Enable Row Level Security
@@ -117,26 +119,126 @@ USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own responses" 
 ON survey_responses FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own responses" 
+ON survey_responses FOR UPDATE 
+USING (auth.uid() = user_id);
+
+-- Drop any existing delete policy and create a new one
+DROP POLICY IF EXISTS "Users can delete their own responses" ON survey_responses;
+CREATE POLICY "Users can delete their own responses" 
+ON survey_responses FOR DELETE 
+USING (auth.uid() = user_id);
 ```
 
 4. Get your Supabase URL and anon key from your project settings and add them to your `.env.local` file.
 
 ## Database Structure
 
-The application uses two main tables:
+The application uses a Supabase PostgreSQL database with the following structure:
 
-1. **user_profiles**: Stores information about survey participants
-   - `id`: Unique identifier (UUID)
-   - `full_name`: The participant's full name
-   - `email`: The participant's email address
-   - `created_at`: Timestamp when the record was created
+### Tables
 
-2. **survey_responses**: Stores the survey responses
-   - `id`: Unique identifier (UUID)
-   - `user_id`: Foreign key referencing the user_profiles table
-   - `question_id`: The ID of the question (e.g., "A-01", "B-03")
-   - `answer`: The participant's answer to the question
-   - `created_at`: Timestamp when the record was created
+1. **user_profiles**
+   - `id`: UUID PRIMARY KEY - References auth.users(id)
+   - `full_name`: TEXT NOT NULL - The participant's full name
+   - `email`: TEXT NOT NULL - The participant's email address (with UNIQUE constraint)
+   - `created_at`: TIMESTAMPTZ NOT NULL DEFAULT NOW() - Timestamp when the record was created
+   - `updated_at`: TIMESTAMPTZ - Timestamp when the record was last updated
+
+2. **survey_responses**
+   - `id`: UUID PRIMARY KEY DEFAULT uuid_generate_v4() - Unique identifier
+   - `user_id`: UUID NOT NULL REFERENCES user_profiles(id) ON DELETE CASCADE - Foreign key to user_profiles
+   - `created_at`: TIMESTAMPTZ NOT NULL DEFAULT NOW() - Timestamp when the record was created
+   - `updated_at`: TIMESTAMPTZ - Timestamp when the record was last updated
+   - Question-specific fields (organized by section):
+     
+   **Section A: FIRM INFORMATION**
+   - `A-01`: TEXT - Industry
+   - `A-02`: TEXT - Region
+   - `A-03`: TEXT - Public/Private
+   - `A-04`: TEXT - Firm Size
+   - `A-05`: TEXT - Age
+   - `A-06`: TEXT - Strengths
+   - `A-07`: TEXT - Methodology
+   - `A-08`: TEXT - Opportunities
+   - `A-09`: TEXT - Competitors
+   - `A-10`: TEXT - Innovation
+   
+   **Section B: SKILLS IDENTIFICATION**
+   - `B-01`: TEXT - Skills
+   - `B-02`: TEXT - Relevance
+   - `B-03`: TEXT - Specific Skills
+   - `B-04`: TEXT - Skills Update
+   - `B-05`: TEXT - Skills Assessment
+   
+   **Section C: COLLABORATION**
+   - `C-01`: TEXT - Training Partnerships
+   - `C-02`: TEXT - Influence of Partnerships
+   - `C-03`: TEXT - Collaboration Difficulties
+   - `C-04`: TEXT - Knowledge
+   - `C-05`: TEXT - Cooperation
+   
+   **Section D: FUTURE PROSPECTS**
+   - `D-01`: TEXT - Future Skills
+   - `D-02`: TEXT - Method
+   - `D-03`: TEXT - Role
+   - `D-04`: TEXT - Effectiveness
+   - `D-05`: TEXT - Recommendations
+   - `D-06`: TEXT - Additional Comments
+
+### Row Level Security (RLS)
+
+Both tables have Row Level Security enabled to control access to data:
+
+1. **user_profiles RLS Policies**
+   - `user_profiles_select_policy`: Users can select their own profile or if authenticated
+   - `user_profiles_insert_policy`: Users can insert their own profile or if authenticated
+   - `user_profiles_update_policy`: Users can only update their own profile
+
+2. **survey_responses RLS Policies**
+   - `survey_responses_select_policy`: Users can select their own responses or if authenticated
+   - `survey_responses_insert_policy`: Users can insert their own responses or if authenticated
+   - `survey_responses_update_policy`: Users can only update their own responses
+   - `survey_responses_delete_policy`: Users can only delete their own responses
+
+### Database Functions and Triggers
+
+1. **update_updated_at_column() Function**
+   - Automatically updates the `updated_at` column with the current timestamp whenever a record is updated
+
+2. **Triggers**
+   - `update_user_profiles_updated_at`: Updates the `updated_at` column in user_profiles table
+   - `update_survey_responses_updated_at`: Updates the `updated_at` column in survey_responses table
+
+### Indexes
+
+The following indexes are created for better query performance:
+
+1. **user_profiles Indexes**
+   - `idx_user_profiles_email`: Index on the email column
+
+2. **survey_responses Indexes**
+   - `idx_survey_responses_user_id`: Index on the user_id column
+   - `idx_survey_responses_question_id`: Index on the question_id column (in the original schema)
+
+### Constraints
+
+1. **user_profiles Constraints**
+   - Primary key on `id`
+   - Unique constraint on `email`
+
+2. **survey_responses Constraints**
+   - Primary key on `id`
+   - Foreign key on `user_id` referencing user_profiles(id) with CASCADE on delete
+   - Unique constraint on `user_id` (one survey response set per user)
+
+### UUID Extension
+
+The database uses the UUID extension to generate UUIDs:
+```sql
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```
 
 ## Deployment
 

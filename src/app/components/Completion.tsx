@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 type CompletionProps = {
   language: 'english' | 'french';
@@ -67,6 +68,18 @@ export default function Completion({ language }: CompletionProps) {
       <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-700 ease-out animate-slideUp">
         <div className="h-2 bg-gradient-to-r from-emerald-600 to-teal-600"></div>
         <div className="p-8 text-center">
+          {/* EMSI Logo */}
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/logo.png" 
+              alt="EMSI - École Marocaine des Sciences de l'Ingénieur" 
+              width={180} 
+              height={60} 
+              className="h-auto object-contain"
+              priority
+            />
+          </div>
+          
           <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-emerald-100 to-teal-100 flex items-center justify-center transform transition-all duration-700 animate-bounce-slow">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

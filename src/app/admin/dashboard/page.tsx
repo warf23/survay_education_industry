@@ -17,39 +17,59 @@ export interface SurveyResponse {
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [surveyData, setSurveyData] = useState<SurveyResponse[]>([]);
   const [activeView, setActiveView] = useState('table');
   const router = useRouter();
 
   useEffect(() => {
     const verifyAuth = async () => {
-      const authenticated = await checkAuth();
-      if (!authenticated) {
-        router.push('/admin/login');
-        return;
-      }
-      
-      setIsAuthenticated(true);
-      
+      console.log('Dashboard: Verifying authentication...');
       try {
-        const data = await fetchSurveyResponses();
-        setSurveyData(data);
+        // Check if authenticated as admin
+        const authenticated = await checkAuth();
+        console.log('Dashboard: Authentication result:', authenticated);
+        
+        if (!authenticated) {
+          console.log('Dashboard: Not authenticated, redirecting to login');
+          router.push('/admin/login');
+          return;
+        }
+        
+        // User is authenticated
+        setIsAuthenticated(true);
+        setAuthChecked(true);
+        
+        // Fetch survey data
+        try {
+          console.log('Dashboard: Fetching survey responses');
+          const data = await fetchSurveyResponses();
+          setSurveyData(data);
+        } catch (error) {
+          console.error('Error fetching survey data:', error);
+        } finally {
+          setIsLoading(false);
+        }
       } catch (error) {
-        console.error('Error fetching survey data:', error);
-      } finally {
-        setIsLoading(false);
+        console.error('Error during auth verification:', error);
+        router.push('/admin/login');
       }
     };
 
-    verifyAuth();
-  }, [router]);
+    if (!authChecked) {
+      verifyAuth();
+    }
+  }, [router, authChecked]);
 
   const handleSignOut = async () => {
+    console.log('Dashboard: Signing out');
     await signOut();
+    setIsAuthenticated(false);
     router.push('/admin/login');
   };
 
-  if (!isAuthenticated) {
+  // While authentication is being checked
+  if (!authChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
@@ -60,29 +80,50 @@ export default function AdminDashboard() {
     );
   }
 
+  // If authentication check is done but user is not authenticated
+  if (!isAuthenticated) {
+    // This shouldn't normally render as we redirect in the useEffect
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <p className="text-red-600">You must be logged in as an admin.</p>
+          <button 
+            onClick={() => router.push('/admin/login')}
+            className="mt-4 bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // If still loading data
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading survey data...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Render the dashboard when authenticated and data is loaded
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <AdminHeader onSignOut={handleSignOut} />
+    <div className="flex h-screen bg-gray-100">
+      <AdminSidebar activeView={activeView} setActiveView={setActiveView} />
       
-      <div className="flex flex-col md:flex-row flex-1">
-        <AdminSidebar activeView={activeView} setActiveView={setActiveView} />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <AdminHeader onSignOut={handleSignOut} />
         
-        <main className="flex-1 p-4 md:p-6 overflow-x-auto">
-          <div className="mb-4 md:mb-6">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Survey Responses</h1>
-            <p className="text-sm md:text-base text-gray-600">View and analyze survey data from respondents</p>
-          </div>
-          
-          {isLoading ? (
-            <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center h-64 md:h-96">
-              <div className="text-center">
-                <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading survey data...</p>
-              </div>
-            </div>
-          ) : (
+        <main className="flex-1 overflow-x-auto overflow-y-auto bg-gray-100 p-4">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-2xl font-semibold text-gray-800 mb-6">Survey Responses</h1>
+            
             <SurveyResponsesTable data={surveyData} />
-          )}
+          </div>
         </main>
       </div>
     </div>

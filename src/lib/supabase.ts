@@ -236,8 +236,28 @@ export async function saveSurveyResponses(userId: string, responses: { questionI
   try {
     console.log('Attempting to save survey responses for user:', userId);
     
-    // First check if the user exists in the user_profiles table
-    const { error: userCheckError } = await supabase
+    // First, verify that the current authenticated user matches the userId
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      console.error('Authentication error:', authError);
+      return false;
+    }
+    
+    if (!user) {
+      console.error('No authenticated user found');
+      return false;
+    }
+    
+    if (user.id !== userId) {
+      console.error('User ID mismatch. Authenticated user:', user.id, 'Requested user:', userId);
+      return false;
+    }
+    
+    const currentTimestamp = new Date().toISOString();
+    
+    // Check if the user exists in the user_profiles table
+    const { data: existingUser, error: userCheckError } = await supabase
       .from('user_profiles')
       .select('id')
       .eq('id', userId)
@@ -245,107 +265,67 @@ export async function saveSurveyResponses(userId: string, responses: { questionI
     
     if (userCheckError) {
       console.error('Error checking if user exists:', userCheckError);
-      
-      // If the user doesn't exist, try to create the user profile
-      if (userCheckError.code === 'PGRST116') { // No rows returned
-        console.log('User profile does not exist. Attempting to create it...');
-        
-        // Get the current authenticated user
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (user && user.id === userId) {
-          const { error: insertError } = await supabase
-            .from('user_profiles')
-            .insert({
-              id: userId,
-              full_name: user.user_metadata.full_name || user.user_metadata.name || 'Anonymous',
-              email: user.email || '',
-              created_at: new Date().toISOString()
-            });
-          
-          if (insertError) {
-            console.error('Error creating user profile:', insertError);
-            return false;
-          }
-          
-          console.log('User profile created successfully');
-        } else {
-          console.error('Cannot create user profile: No authenticated user or ID mismatch');
-          return false;
-        }
-      } else {
-        return false;
-      }
+      return false;
     }
-    
-    // Check if the user has already submitted responses
-    const { data: existingResponses, error: checkError } = await supabase
-      .from('survey_responses')
-      .select('question_id')
-      .eq('user_id', userId);
-    
-    if (checkError) {
-      console.error('Error checking existing responses:', checkError);
+
+    if (!existingUser) {
+      console.error('User does not exist in the database');
       return false;
     }
     
-    const currentTimestamp = new Date().toISOString();
+    // Get existing responses for this user
+    const { data: existingResponses, error: fetchError } = await supabase
+      .from('survey_responses')
+    .select('question_id, answer')
+    .eq('user_id', userId);
     
-    // If user has already submitted responses, update them instead of creating new ones
-    if (existingResponses && existingResponses.length > 0) {
-      console.log(`User ${userId} has already submitted responses. Updating instead of creating new ones.`);
-      
-      // Update user_profiles with updated_at timestamp
-      const { error: updateProfileError } = await supabase
-        .from('user_profiles')
-        .update({ updated_at: currentTimestamp })
-        .eq('id', userId);
-      
-      if (updateProfileError) {
-        console.error('Error updating user profile timestamp:', updateProfileError);
-        // Continue anyway, as this is not critical
-      }
-      
-      // Delete existing responses
-      const { error: deleteError } = await supabase
-        .from('survey_responses')
-        .delete()
-        .eq('user_id', userId);
-      
-      if (deleteError) {
-        console.error('Error deleting existing responses:', deleteError);
-        return false;
-      }
-      
-      console.log(`Deleted existing responses for user ${userId}`);
+    if (fetchError) {
+      console.error('Error fetching existing responses:', fetchError);
+      return false;
     }
-    
-    // Format responses with the current timestamp
-    const formattedResponses = responses.map(response => ({
+
+    // Create a map of existing responses with their created_at timestamps
+    const existingResponseMap = new Map(
+      existingResponses?.map(response => [response.question_id, response.created_at]) || []
+    );
+
+    // Prepare arrays for upsert operation
+    const upsertData = responses.map(response => ({
       user_id: userId,
       question_id: response.questionId,
       answer: response.answer,
-      created_at: currentTimestamp
+      // Keep the original created_at if it exists, otherwise use current timestamp
+      created_at: existingResponseMap.get(response.questionId) || currentTimestamp,
+      updated_at: currentTimestamp
     }));
+
+    console.log('Upserting data for user:', userId);
     
-    console.log(`Saving ${formattedResponses.length} responses for user ${userId}`);
-    
-    // Insert the new or updated responses
-    const { error } = await supabase
+    // Use upsert operation (insert if not exists, update if exists)
+    const { error: upsertError } = await supabase
       .from('survey_responses')
-      .insert(formattedResponses);
-    
-    if (error) {
-      console.error('Error saving survey responses:', error);
-      
-      if (error.code === '23503') {
-        console.error('Foreign key constraint violation. The user ID does not exist in the user_profiles table.');
-      }
-      
+      .upsert(upsertData, {
+        onConflict: 'user_id,question_id',
+        ignoreDuplicates: false
+      });
+
+    if (upsertError) {
+      console.error('Error upserting survey responses:', upsertError);
       return false;
     }
-    
-    console.log('Survey responses saved successfully');
+
+    // Update user_profiles updated_at timestamp
+    const { error: updateProfileError } = await supabase
+      .from('user_profiles')
+      .update({ updated_at: currentTimestamp })
+      .eq('id', userId);
+
+    if (updateProfileError) {
+      console.error('Error updating user profile timestamp:', updateProfileError);
+      // Continue anyway as this is not critical
+    }
+
+    console.log('Survey responses saved successfully for user:', userId);
     return true;
   } catch (error) {
     console.error('Exception saving survey responses:', error);

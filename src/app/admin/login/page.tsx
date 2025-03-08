@@ -17,15 +17,18 @@ export default function AdminLogin() {
     setError('');
 
     try {
+      console.log('Attempting login with:', email);
       const success = await signIn(email, password);
+      console.log('Login result:', success);
+      
       if (success) {
         router.push('/admin/dashboard');
       } else {
-        setError('Invalid email or password');
+        setError('Invalid email or password, or you do not have admin permissions');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('An error occurred during login');
-      console.error(err);
     } finally {
       setLoading(false);
     }

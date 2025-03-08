@@ -6,7 +6,7 @@ export async function fetchSurveyResponses(): Promise<SurveyResponse[]> {
   try {
     // Fetch data from the survey_responses_flat1 view
     const { data, error } = await supabase
-      .from('survey_responses_flat1')
+      .from('survey_responses_flat')
       .select('*');
     
     if (error) {

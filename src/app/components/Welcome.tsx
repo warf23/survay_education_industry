@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { signInWithGoogle, getCurrentUser } from '@/lib/supabase';
+import Image from 'next/image';
 
 type WelcomeProps = {
   onStart: (userId: string, fullName: string, email: string) => void;
@@ -125,7 +126,20 @@ export default function Welcome({ onStart, language, onLanguageChange }: Welcome
       <div className={`max-w-3xl w-full bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500 ease-in-out ${step === 'auth' ? 'transform-gpu scale-100 opacity-100' : ''}`}>
         <div className="h-2 bg-gradient-to-r from-emerald-600 to-teal-500"></div>
         
-        <div className="flex justify-end p-4">
+        <div className="flex justify-between items-center p-4">
+          {/* EMSI Logo */}
+          <div className="flex-shrink-0">
+            <Image 
+              src="/logo.png" 
+              alt="EMSI - École Marocaine des Sciences de l'Ingénieur" 
+              width={180} 
+              height={60} 
+              className="h-auto object-contain"
+              priority
+            />
+          </div>
+          
+          {/* Language Selector */}
           <div className="flex gap-2">
             <button 
               className={`px-3 py-1 rounded-full text-sm transition-all duration-300 ${language === 'english' ? 'bg-emerald-100 text-emerald-800 shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}

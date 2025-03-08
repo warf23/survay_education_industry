@@ -1,43 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/types/supabase';
-import AdminLogin from '@/components/AdminLogin';
-import AdminDashboard from '@/components/AdminDashboard';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const supabase = createClientComponentClient<Database>();
+  const router = useRouter();
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-      setLoading(false);
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
-
-  if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-  }
+    // Simple redirect to dashboard - let the dashboard handle authentication
+    router.push('/admin/dashboard');
+  }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {!isAuthenticated ? (
-        <AdminLogin setIsAuthenticated={setIsAuthenticated} />
-      ) : (
-        <AdminDashboard />
-      )}
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
+      <p className="text-gray-600 ml-4">Loading...</p>
     </div>
   );
 } 
