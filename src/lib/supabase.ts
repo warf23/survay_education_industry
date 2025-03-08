@@ -276,8 +276,8 @@ export async function saveSurveyResponses(userId: string, responses: { questionI
     // Get existing responses for this user
     const { data: existingResponses, error: fetchError } = await supabase
       .from('survey_responses')
-    .select('question_id, answer')
-    .eq('user_id', userId);
+      .select('question_id, answer, created_at')
+      .eq('user_id', userId);
     
     if (fetchError) {
       console.error('Error fetching existing responses:', fetchError);

@@ -1,6 +1,6 @@
 'use client';
 
-import { supabase } from './supabase';
+import { supabase, SurveyResponse } from './supabase';
 
 // Function to sign in with email and password
 export async function signIn(email: string, password: string): Promise<boolean> {
