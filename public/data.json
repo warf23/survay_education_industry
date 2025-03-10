@@ -25,6 +25,11 @@
               { "english": "Transportation", "french": "Transport" },
               { "english": "Energy", "french": "Énergie" },
               { "english": "Media & Entertainment", "french": "Médias et Divertissement" },
+              { "english": "Automobile", "french": "Automobile" },
+              { "english": "Aerospace", "french": "Aéronautique" },
+              { "english": "Telecommunications", "french": "Télécommunications" },
+              { "english": "Agri-food", "french": "Agro-alimentaire" },
+              { "english": "Pharmaceutical", "french": "Pharmaceutique" },
               { "english": "Other", "french": "Autre" }
             ]
           },
@@ -33,15 +38,11 @@
             "label": "Region",
             "english": "Where is your company headquartered?",
             "french": "Où se trouve le siège social de votre entreprise ?",
-            "type": "select",
+            "type": "radio",
             "options": [
-              { "english": "North America", "french": "Amérique du Nord" },
-              { "english": "Europe", "french": "Europe" },
-              { "english": "Asia", "french": "Asie" },
-              { "english": "Africa", "french": "Afrique" },
-              { "english": "South America", "french": "Amérique du Sud" },
-              { "english": "Oceania", "french": "Océanie" },
-              { "english": "Middle East", "french": "Moyen-Orient" }
+              { "english": "Morocco", "french": "Maroc" },
+              { "english": "Abroad (Specify the country)", "french": "Etranger (Précisez le pays)" }
+
             ]
           },
           {
@@ -92,19 +93,8 @@
             "label": "Strengths",
             "english": "What are your strengths in terms of skills, resources and market positioning?",
             "french": "Quelle sont vos forces en terme de compétences, de ressources et de positionnement sur le marché",
-            "type": "multiselect",
-            "options": [
-              { "english": "Technical expertise", "french": "Expertise technique" },
-              { "english": "Customer service", "french": "Service client" },
-              { "english": "Innovation capability", "french": "Capacité d'innovation" },
-              { "english": "Cost efficiency", "french": "Efficacité des coûts" },
-              { "english": "Brand recognition", "french": "Reconnaissance de la marque" },
-              { "english": "Product quality", "french": "Qualité du produit" },
-              { "english": "Market reach", "french": "Portée du marché" },
-              { "english": "Skilled workforce", "french": "Main-d'œuvre qualifiée" },
-              { "english": "Financial resources", "french": "Ressources financières" },
-              { "english": "Other", "french": "Autre" }
-            ]
+            "type": "text"
+            
           },
           {
             "id": "A-07",
@@ -113,16 +103,13 @@
             "french": "Quel est le process de recrutement adopté par votre entreprise?",
             "type": "multiselect",
             "options": [
-              { "english": "Traditional interviews", "french": "Entretiens traditionnels" },
-              { "english": "Behavioral interviews", "french": "Entretiens comportementaux" },
-              { "english": "Technical assessments", "french": "Évaluations techniques" },
-              { "english": "Group interviews", "french": "Entretiens de groupe" },
-              { "english": "Assessment centers", "french": "Centres d'évaluation" },
-              { "english": "Online applications", "french": "Candidatures en ligne" },
-              { "english": "Referral programs", "french": "Programmes de parrainage" },
-              { "english": "Recruitment agencies", "french": "Agences de recrutement" },
-              { "english": "Social media recruiting", "french": "Recrutement via médias sociaux" },
-              { "english": "Other", "french": "Autre" }
+              { "english": "Recruitment events (fairs, job expos)", "french": "Événements de recrutement (salons, foires)" },
+              { "english": "Internal recruitment (promotions and transfers)", "french": "Recrutement interne (promotions et mutations)" },
+              { "english": "External recruitment (unsolicited applications)", "french": "Recrutement externe (candidatures spontanées)" },
+              { "english": "Use of recruitment agencies", "french": "Utilisation de cabinets de recrutement" },
+              { "english": "Job postings on online employment platforms", "french": "Annonces sur des plateformes d'emploi en ligne" },
+              { "english": "Sourcing via social networks (LinkedIn, etc.)", "french": "Sourcing via les réseaux sociaux (LinkedIn, etc.)" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
             ]
           },
           {
@@ -146,14 +133,13 @@
             "french": "Comment votre entreprise mesure-elle son innovation (R&D) ?",
             "type": "multiselect",
             "options": [
-              { "english": "Number of patents filed", "french": "Nombre de brevets déposés" },
-              { "english": "R&D expenditure as % of revenue", "french": "Dépenses de R&D en % du chiffre d'affaires" },
-              { "english": "New product launches", "french": "Lancements de nouveaux produits" },
-              { "english": "Revenue from new products", "french": "Revenus issus de nouveaux produits" },
-              { "english": "Process improvements", "french": "Améliorations des processus" },
-              { "english": "Innovation awards", "french": "Prix d'innovation" },
-              { "english": "Internal idea generation metrics", "french": "Métriques de génération d'idées internes" },
-              { "english": "Other", "french": "Autre" }
+              { "english": "Number of new products or services launched", "french": "Nombre de nouveaux produits ou services lancés" },
+              { "english": "Percentage of revenue dedicated to R&D", "french": "Pourcentage de chiffre d'affaires consacré à la R&D" },
+              { "english": "Success rate of R&D projects", "french": "Taux de succès des projets de R&D" },
+              { "english": "Customer feedback on innovations", "french": "Feedback des clients sur les innovations" },
+              { "english": "Collaboration with research institutes or universities", "french": "Collaboration avec des instituts de recherche ou des universités" },
+              { "english": "Specific performance indicators (KPIs) related to innovation", "french": "Indicateurs de performance spécifiques (KPI) liés à l'innovation" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
             ]
           }
         ]
@@ -175,7 +161,16 @@
             "id": "B-02",
             "label": "Relevance",
             "english": "How would you rate the importance of these skills in the current market context?",
-            "french": "Comment évaluez-vous l'importance de ces compétences dans le contexte actuel du marché ?"
+            "french": "Comment évaluez-vous l'importance de ces compétences dans le contexte actuel du marché ?",
+            "type": "select",
+            "options": [
+              { "english": "Essential for the company's competitiveness", "french": "Essentielles pour la compétitivité de l'entreprise" },
+              { "english": "Important for adapting to market changes", "french": "Importantes pour l'adaptation aux évolutions du marché" },
+              { "english": "Necessary to attract and retain talent", "french": "Nécessaires pour attirer et retenir les talents" },
+              { "english": "Relevant for innovation and differentiation", "french": "Pertinentes pour innover et se différencier" },
+              { "english": "Less important in the short term", "french": "Moins importantes à court terme" },
+              { "english": "Not relevant in the current context", "french": "Non pertinentes dans le contexte actuel" }
+            ]
           },
           {
             "id": "B-03",
@@ -187,13 +182,34 @@
             "id": "B-04",
             "label": "Skills update",
             "english": "How are skills updated to keep pace with technological developments?",
-            "french": "Comment les compétences sont-elles mises à jour pour s'adapter aux évolutions technologiques ?"
+            "french": "Comment les compétences sont-elles mises à jour pour s'adapter aux évolutions technologiques ?",
+            "type": "select",
+            "options": [
+              { "english": "Ongoing training and regular workshops", "french": "Formations continues et ateliers réguliers" },
+              { "english": "Mentorship and coaching by experts", "french": "Mentorat et coaching par des experts" },
+              { "english": "Access to online resources (MOOCs, webinars)", "french": "Accès à des ressources en ligne (MOOCs, webinaires)" },
+              { "english": "Partnerships with training institutions", "french": "Partenariats avec des institutions de formation" },
+              { "english": "Integration of practical projects and case studies", "french": "Intégration de projets pratiques et études de cas" },
+              { "english": "Regular skill assessments and feedback", "french": "Évaluations régulières des compétences et feedbacks" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
+          ]
+          
           },
           {
             "id": "B-05",
             "label": "Skills assessment",
             "english": "What tools or methods do you use to assess learner/employee skills?",
-            "french": "Quels outils ou méthodes utilisez-vous pour évaluer les compétences des apprenants / employés ?"
+            "french": "Quels outils ou méthodes utilisez-vous pour évaluer les compétences des apprenants / employés ?",
+            "type": "select",
+            "options": [
+              { "english": "Formal tests and exams", "french": "Tests et examens formels" },
+              { "english": "Peer evaluations", "french": "Évaluations par les pairs" },
+              { "english": "360-degree feedback", "french": "Feedbacks à 360 degrés" },
+              { "english": "Practical projects and case studies", "french": "Projets pratiques et études de cas" },
+              { "english": "Individual interviews and skills assessments", "french": "Entretiens individuels et bilans de compétences" },
+              { "english": "Online evaluation tools (quizzes, simulations)", "french": "Outils d'évaluation en ligne (quizz, simulations)" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
+            ]
           }
         ]
       },
@@ -208,7 +224,17 @@
             "id": "C-01",
             "label": "Training partnerships",
             "english": "Do you have formal partnerships with training institutions? If so, which ones?",
-            "french": "Avez-vous des partenariats formels avec des institutions de formation? Si oui, lesquels ?"
+            "french": "Avez-vous des partenariats formels avec des institutions de formation? Si oui, lesquels ?",
+            "type": "select",
+            "options": [
+              { "english": "Universities and elite schools", "french": "Universités et grandes écoles" },
+              { "english": "Professional training centers", "french": "Centres de formation professionnelle" },
+              { "english": "Certification organizations (e.g., PMP, ITIL)", "french": "Organisations de certification (ex. : PMP, ITIL)" },
+              { "english": "Online training platforms (e.g., Coursera, Udemy)", "french": "Plateformes de formation en ligne (ex. : Coursera, Udemy)" },
+              { "english": "Research and development institutes", "french": "Instituts de recherche et développement" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" },
+              { "english": "No formal partnership", "french": "Aucun partenariat formel" }
+            ]
           },
           {
             "id": "C-02",
@@ -226,13 +252,32 @@
             "id": "C-04",
             "label": "Knowledge",
             "english": "What are the channels through which companies can pass on their knowledge to training establishments?",
-            "french": "Quels sont les canaux permettant aux entreprises de transmettre leurs savoir aux établissements de formation ?"
+            "french": "Quels sont les canaux permettant aux entreprises de transmettre leurs savoir aux établissements de formation ?",
+            "type": "select",
+            "options": [
+              { "english": "Formal partnerships (e.g., agreements, conventions)", "french": "Partenariats formels (ex. : conventions, accords)" },
+              { "english": "Internships and apprenticeship programs", "french": "Stages et programmes d'apprentissage" },
+              { "english": "Workshops and seminars organized by industry experts", "french": "Ateliers et séminaires organisés par des experts de l'industrie" },
+              { "english": "Contributions to the design of training programs", "french": "Contributions à la conception des programmes de formation" },
+              { "english": "Professional networks and discussion forums", "french": "Réseaux professionnels et forums de discussion" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
+            ]
+
           },
           {
             "id": "C-05",
             "label": "Cooperation",
             "english": "What initiatives could improve cooperation between the two sectors?",
-            "french": "Quelles initiatives pourraient améliorer la coopération entre les deux secteurs ?"
+            "french": "Quelles initiatives pourraient améliorer la coopération entre les deux secteurs ?",
+            "type": "select" ,
+            "options": [
+              { "english": "Development of co-created training programs", "french": "Développement de programmes de formation co-construits" },
+              { "english": "Organization of regular forums and conferences", "french": "Organisation de forums et de conférences régulières" },
+              { "english": "Implementation of collaborative research projects", "french": "Mise en place de projets de recherche collaboratifs" },
+              { "english": "Creation of exchange networks between education and industry professionals", "french": "Création de réseaux d'échange entre professionnels de l'éducation et de l'industrie" },
+              { "english": "Providing internships and practical experiences for students", "french": "Offre de stages et d'expériences pratiques pour les étudiants" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
+            ]
           }
         ]
       },
@@ -253,7 +298,16 @@
             "id": "D-02",
             "label": "Method",
             "english": "How do you think teaching methods should evolve to meet these future needs?",
-            "french": "Comment pensez-vous que les méthodes d'enseignement devraient évoluer pour répondre à ces besoins futurs ?"
+            "french": "Comment pensez-vous que les méthodes d'enseignement devraient évoluer pour répondre à ces besoins futurs ?",
+            "type": "select",
+            "options": [
+              { "english": "Integration of technology and digital tools in education", "french": "Intégration de la technologie et des outils numériques dans l'enseignement" },
+              { "english": "Project-based and competency-based learning approaches", "french": "Approches d'apprentissage par projet et basées sur les compétences" },
+              { "english": "Continuous learning and lifelong education", "french": "Formation continue et apprentissage tout au long de la vie" },
+              { "english": "Personalization of learning paths based on individual needs", "french": "Personnalisation des parcours d'apprentissage en fonction des besoins individuels" },
+              { "english": "Collaboration with industry for relevant training programs", "french": "Collaboration avec l'industrie pour des programmes de formation pertinents" },
+              { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
+            ]
           },
           {
             "id": "D-03",

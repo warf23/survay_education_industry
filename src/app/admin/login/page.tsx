@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from '@/lib/admin-auth';
+import Image from 'next/image';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -35,11 +36,20 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">Admin Panel</h1>
-          <p className="text-gray-600">Sign in to access the dashboard</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-700">
+      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4 transition-all duration-300 hover:shadow-2xl">
+        <div className="flex flex-col items-center justify-center mb-8">
+          <div className="relative w-48 h-24 mb-4">
+            <Image 
+              src="/logo.png" 
+              alt="EMSI Logo" 
+              fill
+              style={{objectFit: 'contain'}}
+              priority
+            />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mt-2">Admin Panel</h1>
+          <p className="text-gray-600 text-center">Sign in to access the dashboard</p>
         </div>
 
         {error && (
@@ -48,7 +58,7 @@ export default function AdminLogin() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -58,7 +68,7 @@ export default function AdminLogin() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
               required
             />
           </div>
@@ -72,7 +82,7 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
               required
             />
           </div>
@@ -80,7 +90,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+            className="w-full bg-emerald-600 text-white py-3 px-4 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-300 disabled:opacity-50 font-medium text-base shadow-md hover:shadow-lg"
           >
             {loading ? (
               <span className="flex items-center justify-center">

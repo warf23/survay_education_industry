@@ -247,6 +247,25 @@ body {
   border-color: var(--primary);
 }
 
+/* Dropdown menu styling */
+.dropdown-menu {
+  z-index: 30;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.dropdown-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
 @keyframes blob {
   0% {
     transform: translate(0px, 0px) scale(1);
