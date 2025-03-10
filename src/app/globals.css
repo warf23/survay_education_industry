@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./responsive.css";
 
 @theme {
   --font-sans: var(--font-geist-sans);
@@ -249,17 +250,55 @@ body {
 
 /* Dropdown menu styling */
 .dropdown-menu {
-  z-index: 30;
+  z-index: 50;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
   margin-top: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+  position: absolute;
+  width: 100%;
+  background-color: white;
+  animation: dropdownFadeIn 0.2s ease-out;
+  transform-origin: top center;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 6px;
 }
 
 .dropdown-item {
-  padding: 10px 12px;
+  padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
 }
 
 .dropdown-item:hover {

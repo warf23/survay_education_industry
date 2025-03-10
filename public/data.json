@@ -183,7 +183,7 @@
             "label": "Skills update",
             "english": "How are skills updated to keep pace with technological developments?",
             "french": "Comment les compétences sont-elles mises à jour pour s'adapter aux évolutions technologiques ?",
-            "type": "select",
+            "type": "multiselect",
             "options": [
               { "english": "Ongoing training and regular workshops", "french": "Formations continues et ateliers réguliers" },
               { "english": "Mentorship and coaching by experts", "french": "Mentorat et coaching par des experts" },
@@ -200,7 +200,7 @@
             "label": "Skills assessment",
             "english": "What tools or methods do you use to assess learner/employee skills?",
             "french": "Quels outils ou méthodes utilisez-vous pour évaluer les compétences des apprenants / employés ?",
-            "type": "select",
+            "type": "multiselect",
             "options": [
               { "english": "Formal tests and exams", "french": "Tests et examens formels" },
               { "english": "Peer evaluations", "french": "Évaluations par les pairs" },
@@ -253,7 +253,7 @@
             "label": "Knowledge",
             "english": "What are the channels through which companies can pass on their knowledge to training establishments?",
             "french": "Quels sont les canaux permettant aux entreprises de transmettre leurs savoir aux établissements de formation ?",
-            "type": "select",
+            "type": "multiselect",
             "options": [
               { "english": "Formal partnerships (e.g., agreements, conventions)", "french": "Partenariats formels (ex. : conventions, accords)" },
               { "english": "Internships and apprenticeship programs", "french": "Stages et programmes d'apprentissage" },
@@ -269,7 +269,7 @@
             "label": "Cooperation",
             "english": "What initiatives could improve cooperation between the two sectors?",
             "french": "Quelles initiatives pourraient améliorer la coopération entre les deux secteurs ?",
-            "type": "select" ,
+            "type": "multiselect" ,
             "options": [
               { "english": "Development of co-created training programs", "french": "Développement de programmes de formation co-construits" },
               { "english": "Organization of regular forums and conferences", "french": "Organisation de forums et de conférences régulières" },
@@ -299,7 +299,7 @@
             "label": "Method",
             "english": "How do you think teaching methods should evolve to meet these future needs?",
             "french": "Comment pensez-vous que les méthodes d'enseignement devraient évoluer pour répondre à ces besoins futurs ?",
-            "type": "select",
+            "type": "multiselect",
             "options": [
               { "english": "Integration of technology and digital tools in education", "french": "Intégration de la technologie et des outils numériques dans l'enseignement" },
               { "english": "Project-based and competency-based learning approaches", "french": "Approches d'apprentissage par projet et basées sur les compétences" },

@@ -242,9 +242,10 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
       }
     };
     
-    document.addEventListener('mousedown', handleClickOutside);
+    // Add event listener with capture phase to ensure it runs before other handlers
+    document.addEventListener('mousedown', handleClickOutside, true);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside, true);
     };
   }, []);
   
@@ -307,7 +308,10 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
           {/* Modern selection display */}
           <div 
             className="w-full p-4 border border-gray-300 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
           >
             <span className={value ? "text-gray-800" : "text-gray-400"}>
               {value || (language === 'english' ? "Select an option" : "Sélectionner une option")}
@@ -324,12 +328,13 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
           
           {/* Options cards container */}
           {isOpen && (
-            <div className="absolute z-30 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto animate-scaleIn dropdown-menu">
+            <div className="dropdown-menu">
               {options.map((option, index) => (
                 <div 
                   key={index} 
                   className={`dropdown-item ${value === option[language] || value.startsWith(`${option[language]}: `) ? "bg-emerald-100 font-medium" : ""}`}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     onChange(option[language]);
                     setIsOpen(false);
                   }}
