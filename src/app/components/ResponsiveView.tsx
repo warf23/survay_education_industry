@@ -51,7 +51,7 @@ const ResponsiveView: React.FC<ResponsiveViewProps> = ({
         return width < breakpointValue;
       case 'only':
         const nextBreakpoint = Object.entries(breakpointValues).find(
-          ([key, value]) => value > breakpointValues[breakpoint as keyof typeof breakpointValues]
+          (entry) => entry[1] > breakpointValues[breakpoint as keyof typeof breakpointValues]
         );
         
         return width >= breakpointValues[breakpoint] && 
