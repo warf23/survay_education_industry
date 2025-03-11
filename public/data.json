@@ -103,12 +103,12 @@
             "french": "Quel est le process de recrutement adopté par votre entreprise?",
             "type": "multiselect",
             "options": [
-              { "english": "Recruitment events (fairs, job expos)", "french": "Événements de recrutement (salons, foires)" },
+              { "english": "Recruitment events (fairs job expos)", "french": "Événements de recrutement ( salons  foires)" },
               { "english": "Internal recruitment (promotions and transfers)", "french": "Recrutement interne (promotions et mutations)" },
               { "english": "External recruitment (unsolicited applications)", "french": "Recrutement externe (candidatures spontanées)" },
               { "english": "Use of recruitment agencies", "french": "Utilisation de cabinets de recrutement" },
               { "english": "Job postings on online employment platforms", "french": "Annonces sur des plateformes d'emploi en ligne" },
-              { "english": "Sourcing via social networks (LinkedIn, etc.)", "french": "Sourcing via les réseaux sociaux (LinkedIn, etc.)" },
+              { "english": "Sourcing via social networks (LinkedIn etc)", "french": "Sourcing via les réseaux sociaux (LinkedIn etc)" },
               { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
             ]
           },
@@ -187,7 +187,7 @@
             "options": [
               { "english": "Ongoing training and regular workshops", "french": "Formations continues et ateliers réguliers" },
               { "english": "Mentorship and coaching by experts", "french": "Mentorat et coaching par des experts" },
-              { "english": "Access to online resources (MOOCs, webinars)", "french": "Accès à des ressources en ligne (MOOCs, webinaires)" },
+              { "english": "Access to online resources (MOOCs  webinars)", "french": "Accès à des ressources en ligne (MOOCs  webinaires)" },
               { "english": "Partnerships with training institutions", "french": "Partenariats avec des institutions de formation" },
               { "english": "Integration of practical projects and case studies", "french": "Intégration de projets pratiques et études de cas" },
               { "english": "Regular skill assessments and feedback", "french": "Évaluations régulières des compétences et feedbacks" },

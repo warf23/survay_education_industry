@@ -68,11 +68,19 @@ export default function Completion({ language }: CompletionProps) {
       <div className="max-w-2xl w-full bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-700 ease-out animate-slideUp">
         <div className="h-2 bg-gradient-to-r from-emerald-600 to-teal-600"></div>
         <div className="p-8 text-center">
-          {/* EMSI Logo */}
-          <div className="flex justify-center mb-6">
+          {/* Logos */}
+          <div className="flex justify-center items-center mb-6 gap-6 flex-col sm:flex-row">
             <Image 
               src="/logo.png" 
               alt="EMSI - École Marocaine des Sciences de l'Ingénieur" 
+              width={180} 
+              height={60} 
+              className="h-auto object-contain"
+              priority
+            />
+            <Image 
+              src="/fsjes.png" 
+              alt="FSJES - Ain Sebâa" 
               width={180} 
               height={60} 
               className="h-auto object-contain"

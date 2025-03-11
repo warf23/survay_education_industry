@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 
 type Option = {
   english: string;
@@ -167,6 +167,18 @@ const stylizeQuestionText = (questionId: string, text: string, language: 'englis
   return <>{parts}</>;
 };
 
+// Helper function to check if an option is a "specify" type option
+const isSpecifyOption = (option: string, language: 'english' | 'french'): boolean => {
+  const specifyTerms = {
+    english: ['other', 'specify', 'please specify', 'custom', 'specify country', 'specify option'],
+    french: ['autre', 'précisez', 'veuillez préciser', 'préciser', 'personnalisé', 'précisez le pays']
+  };
+
+  return specifyTerms[language].some(term => 
+    option.toLowerCase().includes(term.toLowerCase())
+  );
+};
+
 const SelectQuestionComponent = ({ question, language, value, onChange }: SelectQuestionProps) => {
   // Default to text if no type is specified
   const type = question.type || 'text';
@@ -175,64 +187,86 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [otherValue, setOtherValue] = useState('');
   
-  // Check if "Other" is selected
-  const isOtherSelected = value === (language === 'english' ? 'Other' : 'Autre');
+  // Check if selected option is a "specify" type option
+  const selectedOption = value.split(':')?.[0]?.trim() || value;
+  const isOtherSelected = isSpecifyOption(selectedOption, language);
   
-  // For multiselect, check if "Other" is one of the selected values
-  const selectedValues = value ? value.split(',') : [];
-  const isOtherInMultiselect = selectedValues.includes(language === 'english' ? 'Other' : 'Autre');
+  // For multiselect, check if any of the selected values is a "specify" type option
+  const selectedValues = useMemo(() => value ? value.split(',') : [], [value]);
+  const isOtherInMultiselect = selectedValues.some(val => 
+    isSpecifyOption(val.split(':')?.[0]?.trim() || val, language)
+  );
   
   // Handle "Other" text input change
   const handleOtherChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const otherText = e.target.value;
     setOtherValue(otherText);
     
-    // For multiselect, we need to keep the "Other" option in the value
+    // For multiselect, we need to keep the "Other/specify" option in the value
     if (type === 'multiselect') {
-      const otherOption = language === 'english' ? 'Other' : 'Autre';
-      const otherPrefix = `${otherOption}: `;
+      // Find the "specify" option from selected values
+      const specifyOption = selectedValues.find(val => 
+        isSpecifyOption(val.split(':')?.[0]?.trim() || val, language)
+      ) || (language === 'english' ? 'Other' : 'Autre');
       
-      // Remove any previous "Other: something" entry
-      const filteredValues = selectedValues.filter(v => !v.startsWith(otherPrefix) && v !== otherOption);
+      const baseOption = specifyOption.split(':')?.[0]?.trim() || specifyOption;
       
-      // Add the new "Other: something" entry if there's text
+      // Remove any previous "specify: something" entry
+      const filteredValues = selectedValues.filter(v => 
+        !isSpecifyOption(v.split(':')?.[0]?.trim() || v, language)
+      );
+      
+      // Add the new "specify: something" entry if there's text
       if (otherText.trim()) {
-        filteredValues.push(`${otherPrefix}${otherText}`);
+        filteredValues.push(`${baseOption}: ${otherText}`);
       } else {
-        filteredValues.push(otherOption);
+        filteredValues.push(baseOption);
       }
       
       onChange(filteredValues.join(','));
     } else {
-      // For radio and select, we replace the value with "Other: text"
-      const otherOption = language === 'english' ? 'Other' : 'Autre';
+      // For radio and select, we replace the value with "specify: text"
+      const baseOption = selectedOption;
+      
       if (otherText.trim()) {
-        onChange(`${otherOption}: ${otherText}`);
+        onChange(`${baseOption}: ${otherText}`);
       } else {
-        onChange(otherOption);
+        onChange(baseOption);
       }
     }
   };
   
-  // Extract "Other" text from value if it exists
+  // Extract "Other/specify" text from value if it exists
   useEffect(() => {
-    const otherPrefix = language === 'english' ? 'Other: ' : 'Autre: ';
-    
     if (type === 'multiselect') {
-      // For multiselect, find the "Other: something" entry
-      const otherEntry = selectedValues.find(v => v.startsWith(otherPrefix));
-      if (otherEntry) {
-        setOtherValue(otherEntry.substring(otherPrefix.length));
+      // For multiselect, find the "specify: something" entry
+      const specifyEntry = selectedValues.find(val => {
+        const parts = val.split(':');
+        return parts.length > 1 && isSpecifyOption(parts[0].trim(), language);
+      });
+      
+      if (specifyEntry) {
+        const parts = specifyEntry.split(':');
+        if (parts.length > 1) {
+          setOtherValue(parts.slice(1).join(':').trim());
+        } else {
+          setOtherValue('');
+        }
       } else {
         setOtherValue('');
       }
-    } else if (value.startsWith(otherPrefix)) {
+    } else if (value.includes(':') && isOtherSelected) {
       // For radio and select
-      setOtherValue(value.substring(otherPrefix.length));
+      const parts = value.split(':');
+      if (parts.length > 1) {
+        setOtherValue(parts.slice(1).join(':').trim());
+      } else {
+        setOtherValue('');
+      }
     } else {
       setOtherValue('');
     }
-  }, [value, language, type]);
+  }, [value, language, type, isOtherSelected, selectedValues]);
   
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -307,14 +341,16 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
         <div className="relative mt-4" ref={dropdownRef}>
           {/* Modern selection display */}
           <div 
-            className="w-full p-4 border border-gray-300 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
+            className={`w-full p-4 border border-gray-300 rounded-lg flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors shadow-sm ${isOtherSelected && otherValue ? 'border-emerald-400' : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(!isOpen);
             }}
           >
             <span className={value ? "text-gray-800" : "text-gray-400"}>
-              {value || (language === 'english' ? "Select an option" : "Sélectionner une option")}
+              {isOtherSelected && otherValue 
+                ? `${selectedOption}: ${otherValue}` 
+                : value || (language === 'english' ? "Select an option" : "Sélectionner une option")}
             </span>
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -329,33 +365,60 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
           {/* Options cards container */}
           {isOpen && (
             <div className="dropdown-menu">
-              {options.map((option, index) => (
-                <div 
-                  key={index} 
-                  className={`dropdown-item ${value === option[language] || value.startsWith(`${option[language]}: `) ? "bg-emerald-100 font-medium" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onChange(option[language]);
-                    setIsOpen(false);
-                  }}
-                >
-                  {option[language]}
-                </div>
-              ))}
+              {options.map((option, index) => {
+                const optionText = option[language];
+                const isSelected = value === optionText || value.startsWith(`${optionText}: `);
+                const isSpecify = isSpecifyOption(optionText, language);
+                
+                return (
+                  <div 
+                    key={index} 
+                    className={`dropdown-item ${
+                      isSelected ? "bg-emerald-100 font-medium" : ""
+                    } ${isSpecify ? "border-l-4 border-emerald-400 pl-3" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onChange(optionText);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <div className="flex items-center">
+                      {isSpecify && (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      )}
+                      {optionText}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
           
-          {/* "Other" text input field */}
+          {/* Modern "Other/Specify" text input field */}
           {isOtherSelected && (
             <div className="mt-3 animate-fadeIn">
-              <input
-                type="text"
-                className="w-full p-3 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                value={otherValue}
-                onChange={handleOtherChange}
-                placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
-                autoFocus
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                  value={otherValue}
+                  onChange={handleOtherChange}
+                  placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
+                  autoFocus
+                />
+                {otherValue && (
+                  <span className="absolute right-3 top-3 text-emerald-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-emerald-600">
+                {language === 'english' ? 'Your custom answer will be saved automatically' : 'Votre réponse personnalisée sera enregistrée automatiquement'}
+              </p>
             </div>
           )}
         </div>
@@ -364,7 +427,9 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
       {type === 'radio' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
           {options.map((option, index) => {
-            const isSelected = value === option[language] || value.startsWith(`${option[language]}: `);
+            const optionText = option[language];
+            const isSelected = value === optionText || value.startsWith(`${optionText}: `);
+            const isSpecify = isSpecifyOption(optionText, language);
             
             return (
               <div 
@@ -374,8 +439,9 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                   ${isSelected
                     ? "border-emerald-500 bg-emerald-50 shadow-sm" 
                     : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}
+                  ${isSpecify ? "border-l-4 border-emerald-400" : ""}
                 `}
-                onClick={() => onChange(option[language])}
+                onClick={() => onChange(optionText)}
               >
                 <div className="flex items-center">
                   <div className={`
@@ -386,25 +452,45 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                       <div className="h-2.5 w-2.5 bg-emerald-600 rounded-full animate-scaleIn"></div>
                     )}
                   </div>
-                  <label className="cursor-pointer">
-                    {option[language]}
+                  <label className="cursor-pointer flex items-center">
+                    {isSpecify && (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    )}
+                    {optionText}
                   </label>
                 </div>
               </div>
             );
           })}
           
-          {/* "Other" text input field */}
+          {/* Modern "Other/Specify" text input field */}
           {isOtherSelected && (
             <div className="col-span-1 sm:col-span-2 mt-2 animate-fadeIn">
-              <input
-                type="text"
-                className="w-full p-3 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                value={otherValue}
-                onChange={handleOtherChange}
-                placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
-                autoFocus
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                  value={otherValue}
+                  onChange={handleOtherChange}
+                  placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
+                  autoFocus
+                />
+                {otherValue && (
+                  <span className="absolute right-3 top-3 text-emerald-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-emerald-600 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {language === 'english' ? 'Your custom answer will be saved automatically' : 'Votre réponse personnalisée sera enregistrée automatiquement'}
+              </p>
             </div>
           )}
         </div>
@@ -415,6 +501,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
           {options.map((option, index) => {
             const optionText = option[language];
             const isChecked = selectedValues.some(v => v === optionText || v.startsWith(`${optionText}: `));
+            const isSpecify = isSpecifyOption(optionText, language);
             
             return (
               <div 
@@ -424,8 +511,9 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                   ${isChecked 
                     ? "border-emerald-500 bg-emerald-50 shadow-sm" 
                     : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}
+                  ${isSpecify ? "border-l-4 border-emerald-400" : ""}
                 `}
-                onClick={() => handleMultiSelectChange(option[language])}
+                onClick={() => handleMultiSelectChange(optionText)}
               >
                 <div className="flex items-center">
                   <div className={`
@@ -438,25 +526,45 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                       </svg>
                     )}
                   </div>
-                  <label className="cursor-pointer">
-                    {option[language]}
+                  <label className="cursor-pointer flex items-center">
+                    {isSpecify && (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    )}
+                    {optionText}
                   </label>
                 </div>
               </div>
             );
           })}
           
-          {/* "Other" text input field for multiselect */}
+          {/* Modern "Other/Specify" text input field for multiselect */}
           {isOtherInMultiselect && (
             <div className="col-span-1 sm:col-span-2 mt-2 animate-fadeIn">
-              <input
-                type="text"
-                className="w-full p-3 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                value={otherValue}
-                onChange={handleOtherChange}
-                placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
-                autoFocus
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                  value={otherValue}
+                  onChange={handleOtherChange}
+                  placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
+                  autoFocus
+                />
+                {otherValue && (
+                  <span className="absolute right-3 top-3 text-emerald-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-emerald-600 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {language === 'english' ? 'Your custom answer will be saved automatically' : 'Votre réponse personnalisée sera enregistrée automatiquement'}
+              </p>
             </div>
           )}
         </div>
