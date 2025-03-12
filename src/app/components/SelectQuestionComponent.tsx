@@ -186,6 +186,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [otherValue, setOtherValue] = useState('');
+  const [isOtherFocused, setIsOtherFocused] = useState(false);
   
   // Check if selected option is a "specify" type option
   const selectedOption = value.split(':')?.[0]?.trim() || value;
@@ -196,6 +197,12 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
   const isOtherInMultiselect = selectedValues.some(val => 
     isSpecifyOption(val.split(':')?.[0]?.trim() || val, language)
   );
+
+  // Get the "Other" option text in the current language
+  const getOtherOptionText = () => {
+    const otherOption = options.find(opt => isSpecifyOption(opt[language], language));
+    return otherOption ? otherOption[language] : (language === 'english' ? 'Other' : 'Autre');
+  };
   
   // Handle "Other" text input change
   const handleOtherChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -207,7 +214,7 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
       // Find the "specify" option from selected values
       const specifyOption = selectedValues.find(val => 
         isSpecifyOption(val.split(':')?.[0]?.trim() || val, language)
-      ) || (language === 'english' ? 'Other' : 'Autre');
+      ) || getOtherOptionText();
       
       const baseOption = specifyOption.split(':')?.[0]?.trim() || specifyOption;
       
@@ -285,11 +292,28 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
   
   const handleMultiSelectChange = (option: string) => {
     const currentValues = value ? value.split(',') : [];
+    const isCurrentOptionSpecify = isSpecifyOption(option, language);
     
     if (currentValues.includes(option)) {
       // Remove if already selected
       const newValues = currentValues.filter(v => v !== option);
-      onChange(newValues.join(','));
+      
+      // Check if we're deselecting an "other" option with custom text
+      if (isCurrentOptionSpecify) {
+        // Also remove any entries that start with this option followed by a colon
+        const newValuesFiltered = newValues.filter(v => {
+          const parts = v.split(':');
+          const baseOption = parts[0].trim();
+          return !isSpecifyOption(baseOption, language);
+        });
+        
+        // Clear the "other" input value when deselecting the "other" option
+        setOtherValue('');
+        
+        onChange(newValuesFiltered.join(','));
+      } else {
+        onChange(newValues.join(','));
+      }
     } else {
       // Add if not already selected
       currentValues.push(option);
@@ -378,6 +402,10 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                     } ${isSpecify ? "border-l-4 border-emerald-400 pl-3" : ""}`}
                     onClick={(e) => {
                       e.stopPropagation();
+                      // If selecting a non-specify option while "other" is selected, clear the "other" value
+                      if (!isSpecify && isOtherSelected) {
+                        setOtherValue('');
+                      }
                       onChange(optionText);
                       setIsOpen(false);
                     }}
@@ -399,26 +427,64 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
           {/* Modern "Other/Specify" text input field */}
           {isOtherSelected && (
             <div className="mt-3 animate-fadeIn">
-              <div className="relative">
-                <input
-                  type="text"
-                  className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                  value={otherValue}
-                  onChange={handleOtherChange}
-                  placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
-                  autoFocus
-                />
-                {otherValue && (
-                  <span className="absolute right-3 top-3 text-emerald-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <div className={`bg-white p-4 rounded-lg border border-emerald-300 shadow-sm ${isOtherFocused ? 'scale-102 transform transition-transform duration-200' : ''}`}>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {language === 'english' 
+                      ? (selectedOption.toLowerCase().includes('country') ? "Please enter the country name:" : "Please specify:") 
+                      : (selectedOption.toLowerCase().includes('pays') ? "Veuillez saisir le nom du pays:" : "Veuillez préciser:")}
+                  </label>
+                  <button 
+                    type="button"
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
+                    onClick={() => setOtherValue('')}
+                    title={language === 'english' ? "Clear input" : "Effacer l'entrée"}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </span>
-                )}
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-inner bg-emerald-50"
+                    value={otherValue}
+                    onChange={handleOtherChange}
+                    placeholder={language === 'english' 
+                      ? (selectedOption.toLowerCase().includes('country') ? "Enter country name..." : "Please specify...")
+                      : (selectedOption.toLowerCase().includes('pays') ? "Entrez le nom du pays..." : "Veuillez préciser...")}
+                    onFocus={() => setIsOtherFocused(true)}
+                    onBlur={() => setIsOtherFocused(false)}
+                    autoFocus
+                  />
+                  {otherValue ? (
+                    <span className="absolute right-3 top-3 text-emerald-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <span className="absolute right-3 top-3 text-emerald-400">
+                      {selectedOption.toLowerCase().includes('country') || selectedOption.toLowerCase().includes('pays') ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      )}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-emerald-600 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {language === 'english' ? 'Your answer will be saved automatically' : 'Votre réponse sera enregistrée automatiquement'}
+                </p>
               </div>
-              <p className="mt-1 text-xs text-emerald-600">
-                {language === 'english' ? 'Your custom answer will be saved automatically' : 'Votre réponse personnalisée sera enregistrée automatiquement'}
-              </p>
             </div>
           )}
         </div>
@@ -441,7 +507,13 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                     : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}
                   ${isSpecify ? "border-l-4 border-emerald-400" : ""}
                 `}
-                onClick={() => onChange(optionText)}
+                onClick={() => {
+                  // If clicking on a non-specify option while "other" is selected, clear the "other" value
+                  if (!isSpecify && isOtherSelected) {
+                    setOtherValue('');
+                  }
+                  onChange(optionText);
+                }}
               >
                 <div className="flex items-center">
                   <div className={`
@@ -465,32 +537,67 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
             );
           })}
           
-          {/* Modern "Other/Specify" text input field */}
+          {/* Enhanced "Other/Specify" text input field */}
           {isOtherSelected && (
-            <div className="col-span-1 sm:col-span-2 mt-2 animate-fadeIn">
-              <div className="relative">
-                <input
-                  type="text"
-                  className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                  value={otherValue}
-                  onChange={handleOtherChange}
-                  placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
-                  autoFocus
-                />
-                {otherValue && (
-                  <span className="absolute right-3 top-3 text-emerald-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            <div className={`col-span-1 sm:col-span-2 mt-3 animate-fadeIn transition-all duration-300 ${isOtherFocused ? 'scale-102' : ''}`}>
+              <div className="bg-white p-4 rounded-lg border border-emerald-300 shadow-sm">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {language === 'english' 
+                      ? (selectedOption.toLowerCase().includes('country') ? "Please enter the country name:" : "Please specify:") 
+                      : (selectedOption.toLowerCase().includes('pays') ? "Veuillez saisir le nom du pays:" : "Veuillez préciser:")}
+                  </label>
+                  <button 
+                    type="button"
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
+                    onClick={() => setOtherValue('')}
+                    title={language === 'english' ? "Clear input" : "Effacer l'entrée"}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </span>
-                )}
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-inner bg-emerald-50"
+                    value={otherValue}
+                    onChange={handleOtherChange}
+                    placeholder={language === 'english' 
+                      ? (selectedOption.toLowerCase().includes('country') ? "Enter country name..." : "Please specify...")
+                      : (selectedOption.toLowerCase().includes('pays') ? "Entrez le nom du pays..." : "Veuillez préciser...")}
+                    onFocus={() => setIsOtherFocused(true)}
+                    onBlur={() => setIsOtherFocused(false)}
+                    autoFocus
+                  />
+                  {otherValue ? (
+                    <span className="absolute right-3 top-3 text-emerald-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <span className="absolute right-3 top-3 text-emerald-400">
+                      {selectedOption.toLowerCase().includes('country') || selectedOption.toLowerCase().includes('pays') ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      )}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-emerald-600 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {language === 'english' ? 'Your answer will be saved automatically' : 'Votre réponse sera enregistrée automatiquement'}
+                </p>
               </div>
-              <p className="mt-1 text-xs text-emerald-600 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {language === 'english' ? 'Your custom answer will be saved automatically' : 'Votre réponse personnalisée sera enregistrée automatiquement'}
-              </p>
             </div>
           )}
         </div>
@@ -500,8 +607,29 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
           {options.map((option, index) => {
             const optionText = option[language];
-            const isChecked = selectedValues.some(v => v === optionText || v.startsWith(`${optionText}: `));
             const isSpecify = isSpecifyOption(optionText, language);
+            
+            // Check if this option is checked
+            let isChecked = false;
+            let customValue = '';
+            
+            if (isSpecify) {
+              // For "Other" option, check if any value contains the base option
+              isChecked = selectedValues.some(v => {
+                const parts = v.split(':');
+                const baseOption = parts[0].trim();
+                if (isSpecifyOption(baseOption, language)) {
+                  if (parts.length > 1) {
+                    customValue = parts.slice(1).join(':').trim();
+                  }
+                  return true;
+                }
+                return false;
+              });
+            } else {
+              // For regular options, just check if it's in the selected values
+              isChecked = selectedValues.includes(optionText);
+            }
             
             return (
               <div 
@@ -526,45 +654,79 @@ const SelectQuestionComponent = ({ question, language, value, onChange }: Select
                       </svg>
                     )}
                   </div>
-                  <label className="cursor-pointer flex items-center">
-                    {isSpecify && (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
+                  <div className="cursor-pointer flex flex-col">
+                    <div className="flex items-center">
+                      {isSpecify && (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      )}
+                      <span>{optionText}</span>
+                    </div>
+                    
+                    {/* Show custom value inline if exists and this is the "Other" option */}
+                    {isSpecify && isChecked && customValue && (
+                      <div className="ml-6 mt-1 text-sm text-emerald-600 italic animate-fadeIn">
+                        &ldquo;{customValue}&rdquo;
+                      </div>
                     )}
-                    {optionText}
-                  </label>
+                  </div>
                 </div>
               </div>
             );
           })}
           
-          {/* Modern "Other/Specify" text input field for multiselect */}
+          {/* Enhanced "Other/Specify" text input field for multiselect */}
           {isOtherInMultiselect && (
             <div className="col-span-1 sm:col-span-2 mt-2 animate-fadeIn">
-              <div className="relative">
-                <input
-                  type="text"
-                  className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                  value={otherValue}
-                  onChange={handleOtherChange}
-                  placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
-                  autoFocus
-                />
-                {otherValue && (
-                  <span className="absolute right-3 top-3 text-emerald-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <div className={`bg-white p-4 rounded-lg border border-emerald-300 shadow-sm ${isOtherFocused ? 'scale-102 transform transition-transform duration-200' : ''}`}>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {language === 'english' ? "Please specify:" : "Veuillez préciser:"}
+                  </label>
+                  <button 
+                    type="button"
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
+                    onClick={() => setOtherValue('')}
+                    title={language === 'english' ? "Clear input" : "Effacer l'entrée"}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </span>
-                )}
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    className="w-full p-3 pl-4 pr-10 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 shadow-inner bg-emerald-50"
+                    value={otherValue}
+                    onChange={handleOtherChange}
+                    placeholder={language === 'english' ? "Please specify..." : "Veuillez préciser..."}
+                    onFocus={() => setIsOtherFocused(true)}
+                    onBlur={() => setIsOtherFocused(false)}
+                    autoFocus
+                  />
+                  {otherValue ? (
+                    <span className="absolute right-3 top-3 text-emerald-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                  ) : (
+                    <span className="absolute right-3 top-3 text-emerald-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-emerald-600 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {language === 'english' ? 'Your answer will be saved automatically' : 'Votre réponse sera enregistrée automatiquement'}
+                </p>
               </div>
-              <p className="mt-1 text-xs text-emerald-600 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {language === 'english' ? 'Your custom answer will be saved automatically' : 'Votre réponse personnalisée sera enregistrée automatiquement'}
-              </p>
             </div>
           )}
         </div>

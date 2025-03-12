@@ -136,7 +136,7 @@
               { "english": "Number of new products or services launched", "french": "Nombre de nouveaux produits ou services lancés" },
               { "english": "Percentage of revenue dedicated to R&D", "french": "Pourcentage de chiffre d'affaires consacré à la R&D" },
               { "english": "Success rate of R&D projects", "french": "Taux de succès des projets de R&D" },
-              { "english": "Customer feedback on innovations", "french": "Feedback des clients sur les innovations" },
+              { "english": "Client reviews on new innovations", "french": "Avis des clients sur les nouvelles innovations" },
               { "english": "Collaboration with research institutes or universities", "french": "Collaboration avec des instituts de recherche ou des universités" },
               { "english": "Specific performance indicators (KPIs) related to innovation", "french": "Indicateurs de performance spécifiques (KPI) liés à l'innovation" },
               { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
@@ -207,7 +207,7 @@
               { "english": "360-degree feedback", "french": "Feedbacks à 360 degrés" },
               { "english": "Practical projects and case studies", "french": "Projets pratiques et études de cas" },
               { "english": "Individual interviews and skills assessments", "french": "Entretiens individuels et bilans de compétences" },
-              { "english": "Online evaluation tools (quizzes, simulations)", "french": "Outils d'évaluation en ligne (quizz, simulations)" },
+              { "english": "Online evaluation tools (quizzes simulations)", "french": "Outils d'évaluation en ligne (quizz   simulations)" },
               { "english": "Other (Please specify)", "french": "Autres (Merci de préciser)" }
             ]
           }
