@@ -255,7 +255,7 @@
             "french": "Quels sont les canaux permettant aux entreprises de transmettre leurs savoir aux établissements de formation ?",
             "type": "multiselect",
             "options": [
-              { "english": "Formal partnerships (e.g., agreements, conventions)", "french": "Partenariats formels (ex. : conventions, accords)" },
+              { "english": "Formal partnerships (e.g: agreements / conventions)", "french": "Partenariats formels (ex. : conventions / accords)" },
               { "english": "Internships and apprenticeship programs", "french": "Stages et programmes d'apprentissage" },
               { "english": "Workshops and seminars organized by industry experts", "french": "Ateliers et séminaires organisés par des experts de l'industrie" },
               { "english": "Contributions to the design of training programs", "french": "Contributions à la conception des programmes de formation" },

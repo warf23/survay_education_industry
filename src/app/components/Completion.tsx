@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 type CompletionProps = {
   language: 'english' | 'french';
@@ -38,6 +39,10 @@ export default function Completion({ language }: CompletionProps) {
     dataUsage: {
       english: 'Your data will be used for research purposes only and will be handled with confidentiality.',
       french: 'Vos données seront utilisées uniquement à des fins de recherche et seront traitées en toute confidentialité.'
+    },
+    backToHome: {
+      english: 'Back to Home',
+      french: 'Retour à l\'accueil'
     }
   };
 
@@ -111,6 +116,15 @@ export default function Completion({ language }: CompletionProps) {
               {content.dataUsage[language]}
             </p>
           </div>
+          
+          <Link 
+            href="/"
+            className="inline-block text-emerald-600 hover:text-emerald-700 transition-colors duration-200 font-medium animate-fadeIn"
+            style={{ animationDelay: '0.8s' }}
+            onClick={() => window.location.reload()}
+          >
+            {content.backToHome[language]}
+          </Link>
         </div>
       </div>
     </div>
