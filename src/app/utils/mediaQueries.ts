@@ -35,7 +35,6 @@ export const mediaQueries = {
   // Special queries
   portrait: '@media (orientation: portrait)',
   landscape: '@media (orientation: landscape)',
-  dark: '@media (prefers-color-scheme: dark)',
   light: '@media (prefers-color-scheme: light)',
   motion: '@media (prefers-reduced-motion: no-preference)',
   noMotion: '@media (prefers-reduced-motion: reduce)',

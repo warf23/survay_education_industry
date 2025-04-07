@@ -78,14 +78,17 @@ export default function Questionnaire() {
     // Get the current question object
     const currentQuestionObj = currentCategory?.questions[currentQuestion];
     
-    // Ensure we have an answer for the current question (even if it's an empty string)
-    if (currentQuestionObj) {
-      const hasAnswer = answers.some(a => a.questionId === currentQuestionObj.id);
-      
-      if (!hasAnswer) {
-        // If no answer exists, create an empty answer
-        handleAnswer(currentQuestionObj.id, '');
-      }
+    if (!currentQuestionObj) return;
+    
+    // Find the current answer
+    const currentAnswer = answers.find(a => a.questionId === currentQuestionObj.id)?.answer || '';
+    
+    // Check if the answer is empty or only whitespace
+    if (!currentAnswer.trim()) {
+      alert(language === 'english' 
+        ? 'Please answer the current question before proceeding.'
+        : 'Veuillez répondre à la question actuelle avant de continuer.');
+      return;
     }
     
     // Check if we're at the last question in the section
@@ -227,6 +230,9 @@ export default function Questionnaire() {
   
   // Find answer for current question
   const currentAnswer = answers.find(a => a.questionId === currentQuestionObj?.id)?.answer || '';
+  
+  // Check if current question has a non-empty answer
+  const isCurrentQuestionAnswered = Boolean(currentAnswer.trim());
 
   // Add a sign out function to the component
   const handleSignOut = async () => {
@@ -310,6 +316,7 @@ export default function Questionnaire() {
             isFirstQuestion={currentSection === 0 && currentQuestion === 0}
             isLastQuestion={currentSection === totalSections - 1 && currentQuestion === totalQuestionsInSection - 1}
             isSubmitting={isSubmitting}
+            isCurrentQuestionAnswered={isCurrentQuestionAnswered}
           />
         </div>
       </main>

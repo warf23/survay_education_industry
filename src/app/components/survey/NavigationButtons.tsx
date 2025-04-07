@@ -9,6 +9,7 @@ type NavigationButtonsProps = {
   isFirstQuestion: boolean;
   isLastQuestion: boolean;
   isSubmitting: boolean;
+  isCurrentQuestionAnswered: boolean;
 };
 
 export default function NavigationButtons({
@@ -17,7 +18,8 @@ export default function NavigationButtons({
   onNext,
   isFirstQuestion,
   isLastQuestion,
-  isSubmitting
+  isSubmitting,
+  isCurrentQuestionAnswered
 }: NavigationButtonsProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between gap-3 mt-8">
@@ -33,9 +35,10 @@ export default function NavigationButtons({
       </button>
       
       <button 
-        className="order-1 sm:order-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-colors flex items-center justify-center shadow-sm"
+        className={`order-1 sm:order-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg transition-colors flex items-center justify-center shadow-sm ${isCurrentQuestionAnswered ? 'hover:from-emerald-700 hover:to-teal-700' : 'opacity-50 cursor-not-allowed from-gray-400 to-gray-500'}`}
         onClick={onNext}
-        disabled={isSubmitting}
+        disabled={isSubmitting || !isCurrentQuestionAnswered}
+        title={!isCurrentQuestionAnswered ? (language === 'english' ? 'Please answer the current question' : 'Veuillez répondre à la question actuelle') : ''}
       >
         {isLastQuestion ? (
           isSubmitting ? (
